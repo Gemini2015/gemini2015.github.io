@@ -13,7 +13,8 @@ categories: Verilog
 关于iverilog的安装，官网给出了教程[传送门](http://iverilog.wikia.com/wiki/Installation_Guide)  
 另外，网上的教程比较多。  
 
-## 三个平台：  
+## 三个平台：
+
 ### PC:
 没装过，所以不知道好不好装  
 
