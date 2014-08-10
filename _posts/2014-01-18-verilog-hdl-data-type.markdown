@@ -11,34 +11,32 @@ Verilog的数据类型主要有两种：
 1. **连线类型**  
 2. **寄存器类型**  
 
+
 1. 连线类型（Net Type）  
     （类似于电路中的导线，不能存储数据值，实时改变）  
     **驱动方式**：  
-    * 作为逻辑门或模块的输出端  
-    * 用持续赋值语句assign对其进行赋值  
-    
+    > 作为逻辑门或模块的输出端  
+    > 用持续赋值语句assign对其进行赋值  
     **关键字**:
     ```
-    wire,tri  普通连线
-    wor,trior  具有线或特性的连接线
-    wand,triand
-    supply1,supply0  分别是电源（逻辑1），接地（逻辑0）
+        wire,tri  普通连线
+        wor,trior  具有线或特性的连接线
+        wand,triand
+        supply1,supply0  分别是电源（逻辑1），接地（逻辑0）
     ```
-
     eg:
     ```
-    wire[n-1:0] a,b;   //or wire[n:1] a,b
-    assign a=b;  //将b赋值给a
-    wire[7:0] out;
-    wire[3:0] in;
-    assign out[5:2] = in
-    ````
+        wire[n-1:0] a,b;   //or wire[n:1] a,b
+        assign a=b;  //将b赋值给a
+        wire[7:0] out;
+        wire[3:0] in;
+        assign out[5:2] = in
+    ```
 
 2. 寄存器类型（Register Type）  
     （可以存储值）  
     Register变量需要被明确的赋值  
     在设计过程中，必须将寄存器变量放在过程语句中，通过过程赋值语句赋值（initial，always）  
-
     **关键字**:
     ```
     reg
