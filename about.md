@@ -4,8 +4,17 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](http://jekyllrb.com/)
+# Cheng Che  
 
-You can find the source code for the Jekyll new theme at: [github.com/jglovier/jekyll-new](https://github.com/jglovier/jekyll-new)
+俗称：**`CC`**  
+曾被赐予英文名：**`Chris Cheng`**  
+法号：*目前还没有*  
 
-You can find the source code for Jekyll at [github.com/jekyll/jekyll](https://github.com/jekyll/jekyll)
+Tags:
+>`程序员`，`Web 技术爱好者`，`硬件 爱好者`，`什么都爱好 爱好者`  
+
+饭碗:
+>`PC游戏客户端开发`
+
+本博主要记录CC的学习历程，以及释放吐槽能量。
+
