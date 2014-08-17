@@ -1,6 +1,6 @@
 ---
 layout:	post
-title:	"关于密码可信处理的思考" 
+title:	"关于“密码可信处理”的思考" 
 date:	2014-08-17 19:44:28 
 categories:	thinking-in-password 
 ---
