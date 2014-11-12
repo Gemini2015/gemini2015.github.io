@@ -408,3 +408,24 @@ a:visited { color: #205caa; }
     margin: 0 0 15px; }
 
 }
+
+
+/* media queries */
+/* ----------------------------------------------------------*/
+
+.pagination > p
+{
+  display: inline-block;
+}
+
+.previous
+{
+  float: left;
+  padding-left: 200px;
+}
+
+.next
+{
+  float: right;
+  padding-right: 200cpx;
+}

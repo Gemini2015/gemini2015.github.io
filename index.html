@@ -3,26 +3,47 @@ layout: default
 sitemap:
   changefreq: 'weekly'
 ---
-
 <div class="home">
+    <ul class="posts">
+        {% for post in paginator.posts %}
+        <li>
+            <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+            <span class="post-date">{{ post.date | date: "%b %-d, %Y" }}</span>
+            <p>{{ post.description }}</p>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
 
-  <h1>Posts</h1>
-
-  <ul class="posts">
-    {% for post in site.posts %}
-      <li>
-        <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-        <span class="post-date">{{ post.date | date: "%b %-d, %Y" }}</span>
-      </li>
-    {% endfor %}
-  </ul>
-
+<div id="post-pagination" class="pagination">
+    {% if paginator.previous_page %}。
+    <p class="previous">
+    {% if paginator.previous_page == 1 %}
+    <a href="/">Previous</a>
+    {% else %}
+    <a href="{{ paginator.previous_page_path }}">Previous</a>
+    {% endif %}
+    </p>
+    {% else %}
+    <p class="previous disabled">
+    <span>Previous</span>
+    </p>
+    {% endif %}
+    
+    {% if paginator.next_page %}
+    <p class="next">
+    <a href="{{ paginator.next_page_path }}">Next</a>
+    </p>
+    {% else %}
+    <p class="next disabled">
+    <span>Next</span>
+    </p>
+    {% endif %}
 </div>
 
 <script type="text/javascript">
 /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
 var disqus_shortname = 'icodeten'; // required: replace example with your forum shortname
-
 /* * * DON'T EDIT BELOW THIS LINE * * */
 (function () {
     var s = document.createElement('script'); s.async = true;

@@ -7,6 +7,9 @@ url: "http://blog.icodeten.com"
 twitter_username:  Biggemini2015 
 github_username:  Gemini2015
 
+# Html settings
+paginate: 5
+
 # Handling Reading
 encoding: "utf-8" 
 markdown_ext: "markdown,mkdown,mkdn,mkd,md"
