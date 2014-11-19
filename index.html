@@ -3,42 +3,69 @@ layout: default
 sitemap:
   changefreq: 'weekly'
 ---
-<div class="home">
-    <ul class="posts">
-        {% for post in paginator.posts %}
-        <li>
-            <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-            <span class="post-date">{{ post.date | date: "%b %-d, %Y" }}</span>
-            <p>{{ post.description }}</p>
-        </li>
-        {% endfor %}
-    </ul>
-</div>
 
-<div id="post-pagination" class="pagination">
-    {% if paginator.previous_page %}。
-    <p class="previous">
-    {% if paginator.previous_page == 1 %}
-    <a href="/">Previous</a>
-    {% else %}
-    <a href="{{ paginator.previous_page_path }}">Previous</a>
-    {% endif %}
-    </p>
-    {% else %}
-    <p class="previous disabled">
-    <span>Previous</span>
-    </p>
-    {% endif %}
+<div class="container-fluid main-body">
+
+    <div class="row">
+        <div class="col-xs-7">
+            <div clsss="row post-list">            
+        
+                {% for post in paginator.posts %}
+                <div class="post-item">
+                    <a class="h1" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+                    <div class="post-time">
+                    <span class="glyphicon glyphicon-time"></span>
+                    {{ post.date | date: "%b %-d, %Y" }}
+                    </div>
+                    <p class="lead">{{ post.description }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="row paginator">
+                <div class="col-xs-6 text-left">
+                    {% if paginator.previous_page %}
+                
+                        {% if paginator.previous_page == 1 %}
+                        <a href="/" class="btn btn-primary btn-lg" role="button" ><span class="glyphicon glyphicon-arrow-left"> NEW <span class="glyphicon glyphicon-arrow-left"></a>
+                        {% else %}
+                        <a href="{{ paginator.previous_page_path }}" class="btn btn-primary btn-lg" role="button"><span class="glyphicon glyphicon-circle-arrow-left"></span>NEW<span class="glyphicon glyphicon-circle-arrow-left"></a>
+                        {% endif %}
+                    
+                    {% endif %}
+                </div>
+                
+                <div class="col-xs-6 text-right">
+                    {% if paginator.next_page %}
+                    
+                    <a href="{{ paginator.next_page_path }}" class="btn btn-primary btn-lg" role="button"><span class="glyphicon glyphicon-arrow-right"></span> &nbsp;&nbsp;OLD &nbsp;&nbsp;<span class="glyphicon glyphicon-arrow-right"></span></a>
+                    
+                    
+                    {% endif %}
+                </div>
+            
+            </div>
+        </div>
+        <div class="col-xs-1">
+            
+        </div>
+        <div class="col-xs-4 side-info">
+            <div class="row">
+                <div class="col-xs-12">
+                    <img src="{{ "/img/me.png" | prepend: site.baseurl }}" class="img-thumbnail photo" alt="ChrisCheng">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <h2>程澈</h2>
+                    <h4>一个新鲜的游戏开发攻城狮</h4>
+                    <h4>一个Web技术的爱好者</h4>
+                    <h4>最近被Ukulele吸引，准备进入混乱的艺术世界</h4>    
+                </div>
+            </div>
+            
+        </div>
+    </div>
     
-    {% if paginator.next_page %}
-    <p class="next">
-    <a href="{{ paginator.next_page_path }}">Next</a>
-    </p>
-    {% else %}
-    <p class="next disabled">
-    <span>Next</span>
-    </p>
-    {% endif %}
 </div>
 
 <script type="text/javascript">
