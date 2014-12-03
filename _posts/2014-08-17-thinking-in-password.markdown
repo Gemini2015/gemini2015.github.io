@@ -2,7 +2,8 @@
 layout:	post
 title:	"关于“密码可信处理”的思考" 
 date:	2014-08-17 19:44:28 
-categories:	thinking-in-password 
+categories:	thinking-in-password
+description: 对于当前用户认证模型的安全性的思考 
 ---
 
 之前做网站的时候，对于用户的模型的建立与实现，有一些简单的了解，

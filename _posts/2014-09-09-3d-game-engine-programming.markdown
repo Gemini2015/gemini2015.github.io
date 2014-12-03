@@ -3,6 +3,7 @@ layout:	post
 title:	"3D Game Engine Programming - 整理" 
 date:	2014-09-09 21:30:50 
 categories:	game dev 
+description: 从零开始，记录一个游戏引擎的设计过程
 ---
 
 
