@@ -88,7 +88,7 @@ a:visited { color: #205caa; }
 }
 
 .post-header .meta {
-  font-size: 15px;
+  font-size: 16px;
   color: #818181;
   margin-top: 5px;
 }
@@ -134,9 +134,14 @@ a:visited { color: #205caa; }
   margin: 30px 0;
 }
 
-.post-content > p
+.post-content p, li
 {
-  font-size: 18px;
+  font-size: 17px;
+}
+
+.post-content li
+{
+  margin-bottom: 20px;
 }
 
 .post-content ul,
@@ -255,8 +260,8 @@ a:visited { color: #205caa; }
 .site-header {
   border-top: 5px solid #333;
   border-bottom: 1px solid #e8e8e8;
-  min-height: 80px;
-  line-height: 80px;
+  min-height: 60px;
+  line-height: 60px;
   background-color: white;
 }
 
@@ -268,14 +273,14 @@ a:visited { color: #205caa; }
   font-size: 26px;
   letter-spacing: -1px;
   float: left;
-  line-height: 80px;
+  line-height: 60px;
   position: relative;
   z-index: 1;
 }
 
 .site-nav {
   float: right;
-  line-height: 80px;
+  line-height: 60px;
 }
 
 .site-nav .menu-icon { display: none; }
@@ -293,7 +298,7 @@ a:visited { color: #205caa; }
   font-size: 16px;
   letter-spacing: 0px;
   float: left;
-  line-height: 80px;
+  line-height: 60px;
   position: relative;
 }
 
@@ -347,9 +352,9 @@ a:visited { color: #205caa; }
 
 .site-footer {
   border-top: 1px solid #e8e8e8;
-  margin-top: 50px;
+  margin-top: 0px;
   padding: 5px ;
-  line-height: 50px;
+  line-height: 40px;
 }
 
 .site-footer p {
