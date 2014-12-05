@@ -1,4 +1,5 @@
-gemini2015.github.io
+Blog.icodeten.com
 ====================
 
-My Static Blog
+CC的个人博客，记录在程序员这条不归路上的点点滴滴……
+
