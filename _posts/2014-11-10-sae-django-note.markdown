@@ -56,3 +56,20 @@ sae上用数字区分版本。当时版本1已经完成了，准备建立版本2
 
 以上两者中都使用了`昵称`，昵称的可以用来隐藏真实身份，所以在QQ中，你能获取到一个QQ号，但是却不一定能知道这个QQ的主人是谁。我感觉，这也算是一种信息的保护吧。
 在目前的设计中，我们没有使用昵称，而是直接显示真实姓名，因为我们这个网站一开始的定位是一个相互认识熟悉的人的圈子，因此，似乎不需要昵称。这样一来，一个网站实例只能提供一个圈子，若是要能提供任意个圈子，而且圈子与圈子之间要能实现信息隔离的话，似乎还得实现用户分组，以及考虑是否允许昵称等内容，而这些，似乎又是另外一个问题了。
+
+
+## 模型的反向查找
+
+昨天增加了一个模型，该模型中有两个字段是以User为外键，`syncdb`出错：`Accessor for field <field name> clashes with field <field name>.`查了一下官方手册，发现是因为反向查找集命名冲突。
+
+```
+class User(models.Model):
+    pass
+
+class Activity(models.Model):
+    creator = models.ForeignKey('User')
+    organizer = models.ForeignKey('User')
+    pass
+```
+对于上面的`ForeignKey`域，Django会默认在User中增加一个用于反向查找Activity的域，名为`activity_set` 。这个域的作用是查找与User实例相关的所有Activity，使用方法`ac = user.activity_set.all()`，这样一来，对于上面两个`ForeignKey`域，就会产生两个`activity_set`，因此会产生冲突。
+***解决办法***：`ForeignKey`有一个`related_name`参数用于设置反向查找集的名字，可以将这两个修改成不同的名称，或者设为`related_name='+'`，禁用反向查找。
