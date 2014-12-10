@@ -26,5 +26,30 @@ description: 使用OpenGL实现ZFXEngine定义的ZFXRenderDevice
 
     >之前写的OpenGL程序都是直接使用的glut创建窗口，根本不知道OpenGL绘图的时候，需要创建`绘制上下文`，并且将绘制上下文与当前窗口的`DC`绑定，才能开始绘制绘制图形。由此可见，过度依赖于封装好的函数库，对于学习来说并不是一件好事。 
 
-    在OpenGL中，要想绘制图形，必须首先创建一个`RC`（RenderContext），将RC与窗口的DC绑定，才能开始绘制。一个线程只能拥有一个RC，但是可以有多个DC。所以可以使用下面的方法来进行多窗口渲染。同样调用`CreateWindowEx`创建n个Window，获取每个Window的DC，并且将每个DC的像素格式(`PIXELFORMATDESCRIPTOR`)都设置成相同的（RC根据DC创建，一个RC要想与其他DC绑定，该DC必须与创建该RC的DC具有相同的像素格式）。使用`wglCreateContext`（Win平台前缀为`wgl`）创建一个RC，然后在渲染每个窗口之前使用`wglMakeCurrent(NULL, NULL)`解绑定，再调用`wglMakeCurrent(DC, RC)`来将目标DC与RC绑定，使用`SwapBuffers`切换目标DC的前后台缓冲。
+    在OpenGL中，要想绘制图形，必须首先创建一个`RC`（RenderContext），将RC与窗口的DC绑定，才能开始绘制。一个线程只能拥有一个RC，但是可以有多个DC。所以可以使用下面的方法来进行多窗口渲染。同样调用`CreateWindowEx`创建n个Window，获取每个Window的DC，并且调用`ChoosePixelFormat`和`SetPixelFormat`将每个DC的像素格式(`PIXELFORMATDESCRIPTOR`)都设置成相同的（RC根据DC创建，一个RC要想与其他DC绑定，该DC必须与创建该RC的DC具有相同的像素格式）。使用`wglCreateContext`（Win平台前缀为`wgl`）创建一个RC，然后在渲染每个窗口之前使用`wglMakeCurrent(NULL, NULL)`解绑定，再调用`wglMakeCurrent(DC, RC)`来将目标DC与RC绑定，使用`SwapBuffers`切换目标DC的前后台缓冲。
     另一个办法是使用多线程，前面提到一个线程只能拥有一个RC，所以可以通过多线程，来创建多个RC，这样以来接可以避免RC与DC之间的街绑定/绑定问题，实际上，`wglMakeCurrent`函数还是比较耗时的。
+
+
+碰到的一些问题
+--
+
+1.  上面提到了`ChoosePixelFormat`函数，当我在运行的时候，运行到这个函数时，程序直接宕掉了。这个函数的参数是`HDC`和`PIXELFORMATDESCRIPTOR`，我调试了一下，发现这两个参数应该都不会有问题。后来上网搜了一下，在一个英文网站上发现了类似的问题，上面的解释是这个函数会依赖`opengl32.dll`，如果之前没有调用任何gl函数的，程序就不会载入`opengl32.dll`，那么这个函数就会宕掉。解决方法是在这个函数之前随便调用一个gl函数就可以了，我试了一下，调用了一个`glLoadIdentity()`，果然就没问题了。但是后来，我把这个gl调用去掉之后，又不会宕掉，费解。
+
+2.  记一个C++初始化问题，随手写了一个数组初始化，想不到竟然发生了越界，结果运行的时候，是这个地方没有提示异常，反倒是析构的时候报错，debug了半天才发现这个bug。
+    
+    ```
+class A
+{
+    // 有一些成员
+};
+class B
+{
+    A* m_aList[20];
+}
+class B::B()
+{
+    memset(m_aList, 0, sizeof(A)*20); //随手清零
+}
+    ```
+    也许是初始化结构体数组习惯了，随手就用`memset`清零了，一个是指针的大小，一个是类的大小，结果当然就越界了。
+    正确的是应该使用`memset(m_aList, 0, sizeof(A*) * 20)`。或者干脆用个for循环赋值。
