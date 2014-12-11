@@ -38,18 +38,73 @@ description: 使用OpenGL实现ZFXEngine定义的ZFXRenderDevice
 2.  记一个C++初始化问题，随手写了一个数组初始化，想不到竟然发生了越界，结果运行的时候，是这个地方没有提示异常，反倒是析构的时候报错，debug了半天才发现这个bug。
     
     ```
-class A
-{
-    // 有一些成员
-};
-class B
-{
-    A* m_aList[20];
-}
-class B::B()
-{
-    memset(m_aList, 0, sizeof(A)*20); //随手清零
-}
+    class A
+    {
+        // 有一些成员
+    };
+    class B
+    {
+        A* m_aList[20];
+    }
+    class B::B()
+    {
+        memset(m_aList, 0, sizeof(A)*20); //随手清零
+    }
     ```
     也许是初始化结构体数组习惯了，随手就用`memset`清零了，一个是指针的大小，一个是类的大小，结果当然就越界了。
     正确的是应该使用`memset(m_aList, 0, sizeof(A*) * 20)`。或者干脆用个for循环赋值。
+
+3.  今晚，有个问题困扰了我好久，到现在还没有弄清楚：***OpenGL中的颜色字节序***。
+    一般我们常用的颜色格式是`RGBA`，整型表示的话就是`4个Byte`，浮点表示的话就是`4个float`，建立结构体的话如下
+    
+    ```
+    struct color
+    {
+        byte r;
+        byte g;
+        byte b;
+        byte a;
+    };
+    ```
+    在D3D中，往D3D里面传递颜色参数的时候需要用到D3D自带的`D3DCOLOR_RGBA`来生成一个DWORD数据，在这个DWORD数据里面，颜色值的顺序是`ARGB`。x86架构的计算机都是`Little Endian`，低字节在低地址上，那么内存中的顺序从低字节到高字节应该为`B,G,R,A`。
+    再看OpenGL中，查资料也没有看到哪个地方说明了字节序，只是在OGRE的代码里面看到了一个`VET_COLOR_ABGR`的枚举型变量，注释说是OpenGL的顶点颜色类型，如果这就是OpenGL存储颜色的字节序，那么从低地址到高地址就应该为`R,G,B,A`了。
+    有时间还是查查资料，这个搞清楚。
+
+4.  由上面一个问题衍生出的一个问题。关于顶点缓冲数组的描述问题。
+    顶点结构如下:
+
+    ```
+    // Untransformed and lit Vertex
+    struct Light_Vertex
+    {
+        float x, y, z;
+        DWORD clrDiffuse;
+        float tu, tv;
+    };
+    // D3D Flexible Vertex Format
+    #define LVERTEX_FVF (D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX0)
+    ```
+    在D3D中，对于顶点缓冲数组中的`Diffuse Color`数据，是直接接受一个DWORD的，因此，直接调用`D3DCOLOR_RGBA`构造一个DWORD应该就可以了。
+    但是在OpenGL中，我查到了一个`glColorPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer)`函数，第一个参数`size`的含义是每一个Color由多少个Component组成，**只能填3或4**，第二个参数`type`是指每个Component的数据类型。
+    我的疑问是对于上面的结构体，我的参数组合应该是`size = 4, type = GL_UNSIGNED_INT`，还是`size = 4, type = GL_UNSIGNED_BYTE`，理论上，应该是后者，但是如果采用这种组合的话，OpenGL会不会将这个DWORD数据拆开成4个Byte来读取，从低到高分别读取`R,G,B,A`，那么在一开始创建这个DWORD数据的时候，是不是按`A,B,G,R`的顺序构造这个颜色呢？
+    举个例子，假设我需要的颜色是`R=0x01, G=0x02, B=0x03, A=0x04`，那么这个DWORD就应该是`0x04030201`了。
+    后来，为了看起来更加直观，我将上面的结构体修改成了下面这个:
+
+    ```
+    struct Light_Vertex
+    {
+        float x, y, z;
+        union
+        {
+            struct
+            {
+            byte r;
+            byte g;
+            byte b;
+            byte a;
+            };
+            DWORD clrDiffuse;
+        };
+        float tu, tv;
+    };
+    ```
