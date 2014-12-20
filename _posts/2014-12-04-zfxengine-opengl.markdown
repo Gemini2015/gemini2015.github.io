@@ -108,3 +108,88 @@ description: 使用OpenGL实现ZFXEngine定义的ZFXRenderDevice
         float tu, tv;
     };
     ```
+
+5.  ***谈一谈VBO***，这周在调试顶点缓冲，所以将一些心得记录一下。
+    
+    ```
+    typedef struct Pure_Vertex
+    {
+        // 定义顶点包含的数据，除了坐标数据之外，还可包括纹理，法向量等
+        float x, y, z;
+    }PVertex;
+
+    /*
+    一些初始化：如 glewInit()
+    */
+
+    /*
+    创建顶点缓冲对象
+    */
+    GLuint vertexbuffer = 0;
+    // 创建一个缓冲对象，类似于句柄，返回非0才为有效值
+    // glIsBuffer(vertexbuffer)
+    glGenBuffers(1, &vertexbuffer);
+    // 将该对象与特定类型缓冲绑定，
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    // 填入数据
+    // 创建时也可不必传进pVertexData，只需传入buffer_size
+    // 后面可用glBufferSubData来修改数据
+    glBufferData(GL_ARRAY_BUFFER, buffer_size, pVertexData, GL_STATIC_DRAW);
+    // 指定数据的格式，如顶点数据、纹理、法向量的数据类型，偏移量等
+    // 顶点数据格式，一个顶点3个数据（齐次坐标为4），GL_FLOAT类型，stride(可以理解为周期)，偏移值
+    glVertexPointer(3, GL_FLOAT, sizeof(PVertex), 0);
+    // 除此之外还有 glNormalPointer, glColorPointer, glTexCoordPointer
+
+    // 解绑定
+    glBindBuffer(GL_ARRAY_BUFFER, 0)
+
+    // 对于顶点索引，步骤与上面类似
+    GLuint indexbuffer = 0;
+    glGenBuffers(1, &indexbuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, buffer_size, pIndexData, GL_STATIC_DRAW);
+    // 对于索引，不需要指定格式
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    /*
+    中间可以操作其他顶点缓冲对象
+    */
+
+    /*
+    绘制顶点数据
+    */
+    // 首先绑定相关对象
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbuffer);
+
+    //对于顶点数据，使能各个数据部分
+    glEnableClientState(GL_VERTEX_ARRAY);
+    // 其次还有 GL_NORMAL_ARRAY, GL_COLOR_ARRAY, GL_TEXTURE_COORD_ARRAY
+
+    // 调用绘制指令
+    if(bUseIndex)
+    {
+        // 对于采用了索引缓冲的，调用下面的函数
+        // 元素类型，索引数量，索引数据类型，索引数据（对于采用了索引缓冲对象的，此处可以传进NULL）
+        glDrawElements(GL_LINES, index_num, GL_UNSIGNED_SHORT, pIndex);
+    }
+    else
+    {
+        // 不采用索引
+        // 元素类型，起始顶点索引，顶点数量
+        glDrawArrays(GL_LINES, 0, vertex_num);
+    }
+    
+    // 绘制完毕，禁用顶点数据各个部分，解绑定
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+
+    // 最后可以删除对象
+    if(glIsBuffer(vertexbuffer))
+        glDeleteBuffers(1, &vertexbuffer);
+    if(glIsBuffer(indexbuffer))
+        glDeleteBuffers(1, &indexbuffer);
+    ```
