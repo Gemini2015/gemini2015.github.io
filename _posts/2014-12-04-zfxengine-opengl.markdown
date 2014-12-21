@@ -193,3 +193,34 @@ description: 使用OpenGL实现ZFXEngine定义的ZFXRenderDevice
     if(glIsBuffer(indexbuffer))
         glDeleteBuffers(1, &indexbuffer);
     ```
+
+6.  ***关于OpenGL的调试***，实际上就我个人认为，调试OpenGL还是有点麻烦的。因为OpenGL采用状态机的方式管理渲染流水线，所以有些时候，一个设置不对，就可能不会出现绘制结果，并且也不容易发现到底是哪个地方出了问题。我采用了以下一些步骤来调试。
+    
+    1.  **首先检查OpenGL函数调用是否出错**。OpenGL函数不像D3D的函数，D3D函数大多有`HRESULT`的返回值，而OpenGL函数一般没有返回值，所以必须调用`glGetError()`来获取函数调用状态，若返回值不是`GL_NO_ERROR`，那么表明函数调用出错。
+
+        ```
+        #ifdef _DEBUG
+
+        #define CHECK_ERROR {\
+            GLenum error = glGetError();\
+            if(error != GL_NO_ERROR)\
+                 Log("OpenGL Error > File:%s Line:%d Error:%d",__FILE__, __LINE__, error);\
+        }
+
+        #else
+
+        #define CHECK_ERROR {}
+
+        #endif
+        ```
+        我定义了一个上面的宏，如果一个函数里面执行了一些OpenGL函数调用，那么就在这个函数末尾写上`CHECK_ERROR;`语句来检查前面的OpenGL函数调用是否出错。
+
+        >OpenGL的机制是一旦某一个OpenGL函数调用出错，在内部就会设置相应的错误标识，通过glGetError()函数可以获取这个标志，同时，调用glGetError()函数也会清除这个错误标识。否则，这个错误标识会一直存在，后续有其他错误发生，也不会记录新的错误标识。
+
+        OpenGL的错误代码主要描述了错误的类型，比如`GL_INVALID_ENUM`表示发生枚举值错误，`GL_INVALID_VALUE`表示传给OpenGL函数的值错误等等，一般发生了错误之后，主要是根据错误代码，然后分析每一个OpenGL函数调用，来判定错误发生原因。
+
+    2.  **尝试屏蔽次要OpenGL调用，各个击破**。一大堆OpenGL调用聚在一起，是很难调试的，所以要一部分一部分的调试，调试某个部分的时候，先屏蔽掉其他非必要的代码，等这部分调试完毕之后，在调试其它部分。
+        比如调试顶点缓冲的时候，可以先屏蔽掉深度测试、光照、裁剪等，尽量减少无关的OpenGL函数调用，这样便更容易判断出那个地方可能会出问题，只用关注那一块儿即可。
+
+    2.  **获取内部状态**。OpenGL提供了一些函数可以用于获取内部的状态变量，比如视图模型矩阵、投影矩阵等的值。
+        对于视图模型矩阵、投影矩阵，若是调用`gluLookAt`和`gluPerspective`来设置的话，一般不容易出错，可以使用`glGetFloatv`获取当前试图模型矩阵和投影矩阵。如果手动计算矩阵的话，可以将计算出来的矩阵，和上面两个函数设置的矩阵进行对比，这样就能解决计算上的Bug。
