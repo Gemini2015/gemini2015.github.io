@@ -31,6 +31,132 @@ description: 使用OpenGL实现ZFXEngine定义的ZFXRenderDevice
     另一个办法是使用多线程，前面提到一个线程只能拥有一个RC，所以可以通过多线程，来创建多个RC，这样以来接可以避免RC与DC之间的街绑定/绑定问题，实际上，`wglMakeCurrent`函数还是比较耗时的。
 
 
+使用经验
+--
+
+### 谈一谈VBO的使用步骤
+这周在调试顶点缓冲，所以将一些心得记录一下。
+
+```
+typedef struct Pure_Vertex
+{
+    // 定义顶点包含的数据，除了坐标数据之外，还可包括纹理，法向量等
+    float x, y, z;
+}PVertex;
+
+/*
+一些初始化：如 glewInit()
+*/
+
+/*
+创建顶点缓冲对象
+*/
+GLuint vertexbuffer = 0;
+// 创建一个缓冲对象，类似于句柄，返回非0才为有效值
+// glIsBuffer(vertexbuffer)
+glGenBuffers(1, &vertexbuffer);
+// 将该对象与特定类型缓冲绑定，
+glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+// 填入数据
+// 创建时也可不必传进pVertexData，只需传入buffer_size
+// 后面可用glBufferSubData来修改数据
+glBufferData(GL_ARRAY_BUFFER, buffer_size, pVertexData, GL_STATIC_DRAW);
+
+// 解绑定
+glBindBuffer(GL_ARRAY_BUFFER, 0)
+
+// 对于顶点索引，步骤与上面类似
+GLuint indexbuffer = 0;
+glGenBuffers(1, &indexbuffer);
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbuffer);
+glBufferData(GL_ELEMENT_ARRAY_BUFFER, buffer_size, pIndexData, GL_STATIC_DRAW);
+
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+```
+上面包括了一些初始化操作，以及创建顶点缓冲操作，在创建顶点缓冲的时候，可以不马上传进数据，可以在任意位置调用`glBufferSubData`来修改数据。当然修改之前，先要绑定缓冲对象。
+当需要绘制的时候，可以参照下面的步骤。
+
+```
+/*
+绘制顶点数据
+*/
+// 首先绑定相关对象
+glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbuffer);
+
+//对于顶点数据，使能各个数据部分
+glEnableClientState(GL_VERTEX_ARRAY);
+// 其次还有 GL_NORMAL_ARRAY, GL_COLOR_ARRAY, GL_TEXTURE_COORD_ARRAY
+
+// 在创建顶点缓冲的时候，不需要设置顶点数据格式，只需要在调用绘制函数之前设置格式即可
+// 指定数据的格式，如顶点数据、纹理、法向量的数据类型，偏移量等
+// 顶点数据格式，一个顶点3个数据（齐次坐标为4），GL_FLOAT类型，stride(可以理解为周期)，偏移值
+glVertexPointer(3, GL_FLOAT, sizeof(PVertex), 0);
+// 除此之外还有 glNormalPointer, glColorPointer, glTexCoordPointer
+
+// 调用绘制指令
+if(bUseIndex)
+{
+    // 对于采用了索引缓冲的，调用下面的函数
+    // 元素类型，索引数量，索引数据类型，索引数据（对于采用了索引缓冲对象的，此处可以传进NULL）
+    glDrawElements(GL_LINES, index_num, GL_UNSIGNED_SHORT, pIndex);
+}
+else
+{
+    // 不采用索引
+    // 元素类型，起始顶点索引，顶点数量
+    glDrawArrays(GL_LINES, 0, vertex_num);
+}
+
+// 绘制完毕，禁用顶点数据各个部分，解绑定
+glDisableClientState(GL_VERTEX_ARRAY);
+glBindBuffer(GL_ARRAY_BUFFER, 0);
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+```
+上面的代码展示了一次绘制操作的简要流程，在绘制一次之后，只要不删除缓冲对象，那么就可以继续绘制，当不需要这个缓冲对象时，可以删除对象
+
+```
+// 最后可以删除对象
+if(glIsBuffer(vertexbuffer))
+    glDeleteBuffers(1, &vertexbuffer);
+if(glIsBuffer(indexbuffer))
+    glDeleteBuffers(1, &indexbuffer);
+```
+
+
+### 关于OpenGL的调试
+实际上就我个人认为，调试OpenGL还是有点麻烦的。因为OpenGL采用状态机的方式管理渲染流水线，所以有些时候，一个设置不对，就可能不会出现绘制结果，并且也不容易发现到底是哪个地方出了问题。我采用了以下一些步骤来调试。
+
+1.  **首先检查OpenGL函数调用是否出错**。OpenGL函数不像D3D的函数，D3D函数大多有`HRESULT`的返回值，而OpenGL函数一般没有返回值，所以必须调用`glGetError()`来获取函数调用状态，若返回值不是`GL_NO_ERROR`，那么表明函数调用出错。
+
+    ```
+    #ifdef _DEBUG
+
+    #define CHECK_ERROR {\
+        GLenum error = glGetError();\
+        if(error != GL_NO_ERROR)\
+             Log("OpenGL Error > File:%s Line:%d Error:%d",__FILE__, __LINE__, error);\
+    }
+
+    #else
+
+    #define CHECK_ERROR {}
+
+    #endif
+    ```
+    我定义了一个上面的宏，如果一个函数里面执行了一些OpenGL函数调用，那么就在这个函数末尾写上`CHECK_ERROR;`语句来检查前面的OpenGL函数调用是否出错。
+
+    >OpenGL的机制是一旦某一个OpenGL函数调用出错，在内部就会设置相应的错误标识，通过`glGetError()`函数可以获取这个标志，同时，调用glGetError()函数也会清除这个错误标识。否则，这个错误标识会一直存在，后续有其他错误发生，也不会记录新的错误标识。
+
+    OpenGL的错误代码主要描述了错误的类型，比如`GL_INVALID_ENUM`表示发生枚举值错误，`GL_INVALID_VALUE`表示传给OpenGL函数的值错误等等，一般发生了错误之后，主要是根据错误代码，然后分析每一个OpenGL函数调用，来判定错误发生原因。
+
+2.  **尝试屏蔽次要OpenGL调用，各个击破**。一大堆OpenGL调用聚在一起，是很难调试的，所以要一部分一部分的调试，调试某个部分的时候，先屏蔽掉其他非必要的代码，等这部分调试完毕之后，在调试其它部分。
+    比如调试顶点缓冲的时候，可以先屏蔽掉深度测试、光照、裁剪等，尽量减少无关的OpenGL函数调用，这样便更容易判断出那个地方可能会出问题，只用关注那一块儿即可。
+
+2.  **获取内部状态**。OpenGL提供了一些函数可以用于获取内部的状态变量，比如视图模型矩阵、投影矩阵等的值。
+    对于视图模型矩阵、投影矩阵，若是调用`gluLookAt`和`gluPerspective`来设置的话，一般不容易出错，可以使用`glGetFloatv`获取当前试图模型矩阵和投影矩阵。如果手动计算矩阵的话，可以将计算出来的矩阵，和上面两个函数设置的矩阵进行对比，这样就能解决计算上的Bug。
+
+
 碰到的一些问题
 --
 
@@ -109,122 +235,3 @@ description: 使用OpenGL实现ZFXEngine定义的ZFXRenderDevice
         float tu, tv;
     };
     ```
-
-5.  ***谈一谈VBO***，这周在调试顶点缓冲，所以将一些心得记录一下。
-    
-    ```
-    typedef struct Pure_Vertex
-    {
-        // 定义顶点包含的数据，除了坐标数据之外，还可包括纹理，法向量等
-        float x, y, z;
-    }PVertex;
-
-    /*
-    一些初始化：如 glewInit()
-    */
-
-    /*
-    创建顶点缓冲对象
-    */
-    GLuint vertexbuffer = 0;
-    // 创建一个缓冲对象，类似于句柄，返回非0才为有效值
-    // glIsBuffer(vertexbuffer)
-    glGenBuffers(1, &vertexbuffer);
-    // 将该对象与特定类型缓冲绑定，
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    // 填入数据
-    // 创建时也可不必传进pVertexData，只需传入buffer_size
-    // 后面可用glBufferSubData来修改数据
-    glBufferData(GL_ARRAY_BUFFER, buffer_size, pVertexData, GL_STATIC_DRAW);
-   
-    // 解绑定
-    glBindBuffer(GL_ARRAY_BUFFER, 0)
-
-    // 对于顶点索引，步骤与上面类似
-    GLuint indexbuffer = 0;
-    glGenBuffers(1, &indexbuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, buffer_size, pIndexData, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    ```
-    上面包括了一些初始化操作，以及创建顶点缓冲操作，在创建顶点缓冲的时候，可以不马上传进数据，可以在任意位置调用`glBufferSubData`来修改数据。当然修改之前，先要绑定缓冲对象。
-    当需要绘制的时候，可以参照下面的步骤。
-
-    ```
-    /*
-    绘制顶点数据
-    */
-    // 首先绑定相关对象
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbuffer);
-
-    //对于顶点数据，使能各个数据部分
-    glEnableClientState(GL_VERTEX_ARRAY);
-    // 其次还有 GL_NORMAL_ARRAY, GL_COLOR_ARRAY, GL_TEXTURE_COORD_ARRAY
-
-    // 在创建顶点缓冲的时候，不需要设置顶点数据格式，只需要在调用绘制函数之前设置格式即可
-    // 指定数据的格式，如顶点数据、纹理、法向量的数据类型，偏移量等
-    // 顶点数据格式，一个顶点3个数据（齐次坐标为4），GL_FLOAT类型，stride(可以理解为周期)，偏移值
-    glVertexPointer(3, GL_FLOAT, sizeof(PVertex), 0);
-    // 除此之外还有 glNormalPointer, glColorPointer, glTexCoordPointer
-
-    // 调用绘制指令
-    if(bUseIndex)
-    {
-        // 对于采用了索引缓冲的，调用下面的函数
-        // 元素类型，索引数量，索引数据类型，索引数据（对于采用了索引缓冲对象的，此处可以传进NULL）
-        glDrawElements(GL_LINES, index_num, GL_UNSIGNED_SHORT, pIndex);
-    }
-    else
-    {
-        // 不采用索引
-        // 元素类型，起始顶点索引，顶点数量
-        glDrawArrays(GL_LINES, 0, vertex_num);
-    }
-    
-    // 绘制完毕，禁用顶点数据各个部分，解绑定
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    ```
-    上面的代码展示了一次绘制操作的简要流程，在绘制一次之后，只要不删除缓冲对象，那么就可以继续绘制，当不需要这个缓冲对象时，可以删除对象
-
-    ```
-    // 最后可以删除对象
-    if(glIsBuffer(vertexbuffer))
-        glDeleteBuffers(1, &vertexbuffer);
-    if(glIsBuffer(indexbuffer))
-        glDeleteBuffers(1, &indexbuffer);
-    ```
-
-6.  ***关于OpenGL的调试***，实际上就我个人认为，调试OpenGL还是有点麻烦的。因为OpenGL采用状态机的方式管理渲染流水线，所以有些时候，一个设置不对，就可能不会出现绘制结果，并且也不容易发现到底是哪个地方出了问题。我采用了以下一些步骤来调试。
-    
-    1.  **首先检查OpenGL函数调用是否出错**。OpenGL函数不像D3D的函数，D3D函数大多有`HRESULT`的返回值，而OpenGL函数一般没有返回值，所以必须调用`glGetError()`来获取函数调用状态，若返回值不是`GL_NO_ERROR`，那么表明函数调用出错。
-
-        ```
-        #ifdef _DEBUG
-
-        #define CHECK_ERROR {\
-            GLenum error = glGetError();\
-            if(error != GL_NO_ERROR)\
-                 Log("OpenGL Error > File:%s Line:%d Error:%d",__FILE__, __LINE__, error);\
-        }
-
-        #else
-
-        #define CHECK_ERROR {}
-
-        #endif
-        ```
-        我定义了一个上面的宏，如果一个函数里面执行了一些OpenGL函数调用，那么就在这个函数末尾写上`CHECK_ERROR;`语句来检查前面的OpenGL函数调用是否出错。
-
-        >OpenGL的机制是一旦某一个OpenGL函数调用出错，在内部就会设置相应的错误标识，通过`glGetError()`函数可以获取这个标志，同时，调用glGetError()函数也会清除这个错误标识。否则，这个错误标识会一直存在，后续有其他错误发生，也不会记录新的错误标识。
-
-        OpenGL的错误代码主要描述了错误的类型，比如`GL_INVALID_ENUM`表示发生枚举值错误，`GL_INVALID_VALUE`表示传给OpenGL函数的值错误等等，一般发生了错误之后，主要是根据错误代码，然后分析每一个OpenGL函数调用，来判定错误发生原因。
-
-    2.  **尝试屏蔽次要OpenGL调用，各个击破**。一大堆OpenGL调用聚在一起，是很难调试的，所以要一部分一部分的调试，调试某个部分的时候，先屏蔽掉其他非必要的代码，等这部分调试完毕之后，在调试其它部分。
-        比如调试顶点缓冲的时候，可以先屏蔽掉深度测试、光照、裁剪等，尽量减少无关的OpenGL函数调用，这样便更容易判断出那个地方可能会出问题，只用关注那一块儿即可。
-
-    2.  **获取内部状态**。OpenGL提供了一些函数可以用于获取内部的状态变量，比如视图模型矩阵、投影矩阵等的值。
-        对于视图模型矩阵、投影矩阵，若是调用`gluLookAt`和`gluPerspective`来设置的话，一般不容易出错，可以使用`glGetFloatv`获取当前试图模型矩阵和投影矩阵。如果手动计算矩阵的话，可以将计算出来的矩阵，和上面两个函数设置的矩阵进行对比，这样就能解决计算上的Bug。
