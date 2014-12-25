@@ -135,11 +135,7 @@ description: 使用OpenGL实现ZFXEngine定义的ZFXRenderDevice
     // 创建时也可不必传进pVertexData，只需传入buffer_size
     // 后面可用glBufferSubData来修改数据
     glBufferData(GL_ARRAY_BUFFER, buffer_size, pVertexData, GL_STATIC_DRAW);
-    // 指定数据的格式，如顶点数据、纹理、法向量的数据类型，偏移量等
-    // 顶点数据格式，一个顶点3个数据（齐次坐标为4），GL_FLOAT类型，stride(可以理解为周期)，偏移值
-    glVertexPointer(3, GL_FLOAT, sizeof(PVertex), 0);
-    // 除此之外还有 glNormalPointer, glColorPointer, glTexCoordPointer
-
+   
     // 解绑定
     glBindBuffer(GL_ARRAY_BUFFER, 0)
 
@@ -148,14 +144,13 @@ description: 使用OpenGL实现ZFXEngine定义的ZFXRenderDevice
     glGenBuffers(1, &indexbuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, buffer_size, pIndexData, GL_STATIC_DRAW);
-    // 对于索引，不需要指定格式
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    ```
+    上面包括了一些初始化操作，以及创建顶点缓冲操作，在创建顶点缓冲的时候，可以不马上传进数据，可以在任意位置调用`glBufferSubData`来修改数据。当然修改之前，先要绑定缓冲对象。
+    当需要绘制的时候，可以参照下面的步骤。
 
-    /*
-    中间可以操作其他顶点缓冲对象
-    */
-
+    ```
     /*
     绘制顶点数据
     */
@@ -166,6 +161,12 @@ description: 使用OpenGL实现ZFXEngine定义的ZFXRenderDevice
     //对于顶点数据，使能各个数据部分
     glEnableClientState(GL_VERTEX_ARRAY);
     // 其次还有 GL_NORMAL_ARRAY, GL_COLOR_ARRAY, GL_TEXTURE_COORD_ARRAY
+
+    // 在创建顶点缓冲的时候，不需要设置顶点数据格式，只需要在调用绘制函数之前设置格式即可
+    // 指定数据的格式，如顶点数据、纹理、法向量的数据类型，偏移量等
+    // 顶点数据格式，一个顶点3个数据（齐次坐标为4），GL_FLOAT类型，stride(可以理解为周期)，偏移值
+    glVertexPointer(3, GL_FLOAT, sizeof(PVertex), 0);
+    // 除此之外还有 glNormalPointer, glColorPointer, glTexCoordPointer
 
     // 调用绘制指令
     if(bUseIndex)
@@ -185,8 +186,10 @@ description: 使用OpenGL实现ZFXEngine定义的ZFXRenderDevice
     glDisableClientState(GL_VERTEX_ARRAY);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    ```
+    上面的代码展示了一次绘制操作的简要流程，在绘制一次之后，只要不删除缓冲对象，那么就可以继续绘制，当不需要这个缓冲对象时，可以删除对象
 
-
+    ```
     // 最后可以删除对象
     if(glIsBuffer(vertexbuffer))
         glDeleteBuffers(1, &vertexbuffer);
@@ -215,7 +218,7 @@ description: 使用OpenGL实现ZFXEngine定义的ZFXRenderDevice
         ```
         我定义了一个上面的宏，如果一个函数里面执行了一些OpenGL函数调用，那么就在这个函数末尾写上`CHECK_ERROR;`语句来检查前面的OpenGL函数调用是否出错。
 
-        >OpenGL的机制是一旦某一个OpenGL函数调用出错，在内部就会设置相应的错误标识，通过glGetError()函数可以获取这个标志，同时，调用glGetError()函数也会清除这个错误标识。否则，这个错误标识会一直存在，后续有其他错误发生，也不会记录新的错误标识。
+        >OpenGL的机制是一旦某一个OpenGL函数调用出错，在内部就会设置相应的错误标识，通过`glGetError()`函数可以获取这个标志，同时，调用glGetError()函数也会清除这个错误标识。否则，这个错误标识会一直存在，后续有其他错误发生，也不会记录新的错误标识。
 
         OpenGL的错误代码主要描述了错误的类型，比如`GL_INVALID_ENUM`表示发生枚举值错误，`GL_INVALID_VALUE`表示传给OpenGL函数的值错误等等，一般发生了错误之后，主要是根据错误代码，然后分析每一个OpenGL函数调用，来判定错误发生原因。
 
