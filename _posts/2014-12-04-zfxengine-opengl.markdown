@@ -16,6 +16,7 @@ description: 使用OpenGL实现ZFXEngine定义的ZFXRenderDevice
 1.  ***OpenGL中的矩阵采用列向量(Ogre等)，而D3D采用行向量***。这个差异的后果就是，*矩阵相乘的顺序*会发生改变，以及*变换矩阵中平移变换元素的位置*发生改变。
     在OpenGL中，矩阵与向量相乘的顺序是`ProjectionMatrix * ViewMatrix * ModelMatrix * VertexPosition`，而在D3D中则是`VertexPosition * ModelMatrix * ViewMatrix * ProjectionMatrix`，刚好相反，显然D3D的顺序更符合人类的认知习惯，但从计算机的角度来讲，使用列向量似乎可以获得一个好的运行效率。
     在OpenGL中，平移变量为`m[1][4] = x, m[2][4] = y, m[3][4] = z`，而在D3D中则是`m[4][1] = x, m[4][2] = y, m[4][3] = z`，对于比例，旋转变换，OpenGL与D3D没有什么区别。
+    若是用`float m[16];`来表示一个4 × 4的矩阵，那么对于OpenGL和D3D来说，平移变换变量都是`m[12] = x, m[13] = y, m[14]= z`, 因为`m[12]`对于OpenGL来说代表`第一行第四列`,对于D3D来说则代表`第四行第一列`。
 
 2.  从个人的角度来讲，***OpenGL的编程属于C风格，D3D则偏向于C++风格***。
     在OpenGL中，实现各种功能主要是通过调用`gl`或是`wgl(Win平台)`开头的全局函数，设置参数，传入数据，绘制……
