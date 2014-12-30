@@ -124,6 +124,83 @@ if(glIsBuffer(indexbuffer))
 ```
 
 
+### 使用VAO来管理渲染状态
+上面说到了VBO，VBO主要用来作为数据的容器，在具体绘制时，还会涉及到绘制状态参数的设置。VAO的作用就是管理渲染的状态。
+使用VAO的步骤如下：
+
+```
+初始化VAO阶段：
+    创建VAO，绑定VAO;
+    创建VBO，绑定VBO，填充数据，设置顶点属性，启用顶点属性;
+    解绑定;
+
+绘制阶段：
+    绑定VAO;
+    调用OpenGL绘制函数;
+    解绑定VAO;
+```
+从上面的伪代码中可以看出，在初始化阶段，VAO可以保存设置的渲染状态参数，在绘制阶段，不用再设置渲染状态，就可直接调用绘制函数。
+一个使用VAO的例子如下：
+
+```
+typedef struct VERTEX_T
+{
+    float x, y, z;
+    float vN[3];
+}VERTEX;
+enum
+{
+    vPosition = 0,
+    vNormal = 1,
+};
+// 初始化VBO
+void initialVBO(int VertexNum, VERTEX * vertex, int IndexNum, WORD * index)
+{
+    glGenBuffers(1, &vertexVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
+    glBufferData(GL_ARRAY_BUFFER, VertexNum * sizeof(VERTEX), vertex, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glGenBuffers(1, &indexVBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, IndexNum * sizeof(WORD), index, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+// 初始化VAO
+void initial(GLuint vertex, GLuint index)
+{
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vertex);
+    glEnableVertexAttribArray(vPosition);
+    glEnableVertexAttribArray(vNormal);
+    /*
+    在 vertex shader中可以使用下面的语句获取到每个顶点的属性
+    layout(location = 0) in vec3 vPosition;
+    layout(location = 1) in vec3 vNormal;
+    */
+    glVertexAttribPointer(vPosition, 3, GL_FLOAT, GL_FALSE, sizoef(VERTEX), 0);
+    glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, sizoef(VERTEX), (void*)(3 * sizeof(float)));
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
+
+    glBindVertexArray(0);
+}
+// 绘制图形
+void draw(GLuint vao)
+{
+    glBindVertexArray(vao);
+
+    glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, 0);
+
+    glBindVertexArray(0);
+}
+```
+
+
 ### 关于OpenGL的调试
 实际上就我个人认为，调试OpenGL还是有点麻烦的。因为OpenGL采用状态机的方式管理渲染流水线，所以有些时候，一个设置不对，就可能不会出现绘制结果，并且也不容易发现到底是哪个地方出了问题。我采用了以下一些步骤来调试。
 
@@ -157,8 +234,7 @@ if(glIsBuffer(indexbuffer))
     对于视图模型矩阵、投影矩阵，若是调用`gluLookAt`和`gluPerspective`来设置的话，一般不容易出错，可以使用`glGetFloatv`获取当前试图模型矩阵和投影矩阵。如果手动计算矩阵的话，可以将计算出来的矩阵，和上面两个函数设置的矩阵进行对比，这样就能解决计算上的Bug。
 
 
-碰到的一些问题
---
+## 碰到的一些问题
 
 1.  上面提到了`ChoosePixelFormat`函数，当我在运行的时候，运行到这个函数时，程序直接宕掉了。这个函数的参数是`HDC`和`PIXELFORMATDESCRIPTOR`，我调试了一下，发现这两个参数应该都不会有问题。后来上网搜了一下，在一个英文网站上发现了类似的问题，上面的解释是这个函数会依赖`opengl32.dll`，如果之前没有调用任何gl函数的，程序就不会载入`opengl32.dll`，那么这个函数就会宕掉。解决方法是在这个函数之前随便调用一个gl函数就可以了，我试了一下，调用了一个`glLoadIdentity()`，果然就没问题了。但是后来，我把这个gl调用去掉之后，又不会宕掉，费解。
 
