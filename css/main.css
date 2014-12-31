@@ -182,6 +182,21 @@ a:visited { color: #205caa; }
 
 .post pre.terminal code { background-color: #333; }
 
+.highlighter-coderay table
+{
+  width: 100%;
+}
+
+.line-numbers
+{
+  width: 5%;
+}
+
+.line-numbers > pre
+{
+  text-align: right;
+}
+
 /* Syntax highlighting styles */
 /* ----------------------------------------------------------*/
 

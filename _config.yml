@@ -40,8 +40,9 @@ kramdown:
     input: GFM
 
     coderay:
+        coderay_default_lang:      cpp
         coderay_wrap:              div
-        coderay_line_numbers:      inline
+        coderay_line_numbers:      table
         coderay_line_number_start: 1
         coderay_tab_width:         4
         coderay_bold_every:        10
