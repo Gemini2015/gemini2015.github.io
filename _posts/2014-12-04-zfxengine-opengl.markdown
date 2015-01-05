@@ -232,6 +232,111 @@ void draw(GLuint vao)
 但是为了消除潜在的不确定性，所以在启用着色器时，最好禁用各个顶点格式。
 
 
+### 着色器的Uniform变量
+在OpenGL对应的着色器语言GLSL中，`Uniform`作为一个**存储限制符**，指定一个变量由应用程序中设置好，在着色器程序中不会发生改变的变量，比如一帧中的MVP（Model, View, Projection）变换矩阵，环境光，纹理等。
+声明格式如`uniform mat4 MVP;`。对Uniform变量的操作，可以参考以下过程。
+
+```cpp
+// 获取名为"mvp"的Uniform变量的存储位置
+// program为指定program对象，"mvp"为着色器程序中的变量名
+GLint location = glGetUniformLocation(program,"mvp")
+
+// 设置变量值
+if(location != -1)
+{
+    glUniformMatrix4fv(location, 1, GL_FALSE, &mvp_matrix);
+}
+```
+上面的过程会涉及到一些问题，那就是在`glGetUniformLocation`处，传进了硬字符串。
+
+1.  当在设计一个引擎的时候，类似于MVP这样的Uniform变量，其值一般是由引擎内部管理的，所以说当用户在写着色器的时候，必须与内部MVP使用的名称相同。
+
+2.  引擎必须支持对任意的着色器Uniform变量赋值，也就是说假设我在着色器里面有一个名为`time`(可以是任意名称)的变量，那么在程序里面，引擎必须提供接口可以为这个名为`time`的Uniform变量赋值。
+
+就我目前的理解来看，对于第一种情况，似乎只能为每个引擎制定一种着色器规范，然后用户编写着色器的时候，按照这个规范来对某些Uniform进行命名。
+
+> **OGRE的解决方案**：
+> OGRE用`material`来组织着色器程序，在着色器程序中，对任意变量可以取任意名称（比如MVP变换矩阵可以取名为"mvp"，也可以取名为"mvp_matrix"，当然，必须得是合法的GLSL标识符）。
+> 写好着色器程序之后，在对应的后缀名为`material`的文件中，需要对一些**自动更新的变量**进行**映射**，比如对于上面的取名为"mvp"的MVP变换矩阵，映射形式如`param_named_auto mvp worldviewproj_matrix`，其中`worldviewproj_matrix`就是OGRE内部使用的名称。
+> 
+> 在OGRE内部，有一个名为`AutoConstanDictionary[]`的数组，定义了OGRE内部会进行自动更新的变量的名称。
+
+对于第二种情况，通过OpenGL提供的一些函数可以解决这个问题。
+
+```cpp
+// 建立一张表，来保存当前着色器程序使用到的所有Uniform变量
+typedef struct UNIFORM_PARAM_TYPE
+{
+    string name;
+    GLsizei size;
+    GLenum type;
+    GLint location;
+}UNIFORM_PARAM;
+
+typedef std::map<string, UNIFORM_PARAM> Uniform_Map;
+Uniform_Map uniform_list;
+
+void UseProgram()
+{
+    /*
+    一些操作
+    */
+    glUseProgram(program);
+
+    // 收集 Uniform 信息
+    CollectUniform(program);
+}
+
+void CollectUniform(GLuint program)
+{
+    GLint num = 0;
+    // 获取当前使用的着色器中，定义了多少个Uniform变量
+    glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &num);
+
+    for(int i = 0; i < num; i++)
+    {
+        char buf[256] = {0};
+        GLsizei length = 0;
+        GLsizei size = 0;
+        GLenum type = 0 ;
+        // 获取每个Uniform变量的信息
+        glGetActiveUniform(program, i, 256, &length, &size, &type, buf);
+
+        if(length > 0)
+        {
+            // 获取Uniform的位置
+            GLint location = glGetUniformLocation(program, buf);
+            if(location >= 0)
+            {
+                // 插入Uniform表中
+                UNIFORM_PARAM uniform_param;
+                uniform_param.name.assign(buf);
+                uniform_param.type = type;
+                uniform_param.size = size;
+                uniform_param.location = location;
+
+                uniform_list[uniform_param.name] = uniform_param;
+            }
+        }
+    }
+}
+
+// 设置变量值，可以进行重载，支持多种数据类型
+void SetNamedConstant(string name, float v)
+{
+    // 查找当前着色器程序中是否有名为name的Uniform变量
+    Uniform_Map::iterator it = uniform_list.find(name);
+    if(it != uniform_list.end())
+    {
+        UNIFORM_PARAM uniform = it->second;
+
+        // 根据前面保存的 location 信息，设置值
+        glUniform1f(uniform.location, v);
+    }
+}
+```
+
+
 ### 关于OpenGL的调试
 实际上就我个人认为，调试OpenGL还是有点麻烦的。因为OpenGL采用状态机的方式管理渲染流水线，所以有些时候，一个设置不对，就可能不会出现绘制结果，并且也不容易发现到底是哪个地方出了问题。我采用了以下一些步骤来调试。
 
