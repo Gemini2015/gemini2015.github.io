@@ -15,11 +15,11 @@ encoding: "utf-8"
 markdown_ext: "markdown,mkdown,mkdn,mkd,md"
 
 # Build settings
-markdown: kramdown
+markdown: redcarpet-pygments
 permalink: pretty
 
 # My setting
-highlighter: coderay
+highlighter: pygments
 
 maruku:
   use_tex:    false
