@@ -11,7 +11,7 @@ categories: Verilog
  
 词法
 --
-词法就是词的组成。Verilog HDL的符号流包括 空白符(White Space)、操作符(Operators)、数字(Numbers)、字符串(Strings)、注释(Comments)、标识符(Identifiers)、关键字(Keywords)。  
+词法就是词的组成。Verilog HDL的符号流包括 空白符(White Space)、操作符(Operators)、数字(Numbers)、字符串(Strings)、注释(Comments)、标识符(Identifiers)、关键字(Keywords)。
 
 1.  空白符与C语言相同，如空格，制表符，换行符等，Verilog程序可以分行，也可以不分行。
 
@@ -22,17 +22,21 @@ categories: Verilog
 3.  数字的表示方法与C语言有点不同。
     Verilog HDL有4中基本状态：0，1，x(或X，未知态），z（或Z，高阻，或用?表示）。  
     常量有3种类型：整数，实数，字符串。  
-    整数与C语言表示方法差异较大，完整格式为：`+/-<size><base><value>`  
+    整数与C语言表示方法差异较大，完整格式为：
+    
+    ```
+    +/-<size><base><value>
+    ```
     其中size表示对应的二进制数的宽度，base表示进制，value表示基于进制的数字值。  
     base（缺省为d/D）：b/B，d/D，o/O，h/H。  
-    
     **eg**:
-    <pre><code>
+
+    ```
 8'b11000101 = 二进制的11000101
 8'hd5 = 16进制的d5
 4'B1x_01 = 二进制的1x01
 5'Hx = 16进制的x，对应于二进制的xxxxx
-    </code></pre>
+    ```
 
     **tips**：  
     size指的是对应的二进制的宽度，于base无关，如2'h1 =  01B,而不是 00000001B。
