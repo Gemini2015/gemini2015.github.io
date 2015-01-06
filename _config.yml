@@ -15,7 +15,7 @@ encoding: "utf-8"
 markdown_ext: "markdown,mkdown,mkdn,mkd,md"
 
 # Build settings
-markdown: kramdown
+markdown: redcarpet_pygments
 permalink: pretty
 
 # My setting

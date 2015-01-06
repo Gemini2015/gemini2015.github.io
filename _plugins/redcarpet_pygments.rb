@@ -19,11 +19,11 @@ module Jekyll
           RDiscountParser.new @config
         when 'maruku'
           MarukuParser.new @config
-        when 'redcarpet-pygments' # Hi! I'm a custom parser
+        when 'redcarpet_pygments' # Hi! I'm a custom parser
           RedcarpetPygmentsParser.new @config
         else
           STDERR.puts "Invalid Markdown processor: #{@config['markdown']}"
-          STDERR.puts " Valid options are [ maruku | rdiscount | kramdown | redcarpet-pygments ]"
+          STDERR.puts " Valid options are [ maruku | rdiscount | kramdown | redcarpet_pygments ]"
           raise FatalException.new("Invalid Markdown process: #{@config['markdown']}")
         end
         @setup = true
