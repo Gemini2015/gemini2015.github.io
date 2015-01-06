@@ -5,8 +5,8 @@ module Jekyll
     class Markdown < Converter
       safe true
 
-      highlighter_prefix "\n"
-      highlighter_suffix "\n"
+      pygments_prefix "\n"
+      pygments_suffix "\n"
 
       def setup
         return if @setup
