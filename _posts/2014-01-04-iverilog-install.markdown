@@ -3,6 +3,7 @@ layout: post
 title:  "iVerilog 安装"
 date:   2014-01-04 21:24:21
 categories: Verilog
+description: iVerilog 的安装步骤
 ---
 
 
