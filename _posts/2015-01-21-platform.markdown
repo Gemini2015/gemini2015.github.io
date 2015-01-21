@@ -1,0 +1,98 @@
+---
+layout: post
+title: 平台独立层
+date: 2015-01-21 10:47:02
+categories: Game
+---
+
+
+一个良好的跨平台游戏引擎必须实现平台解耦，通过实现平台抽象层，将游戏引擎与具体平台隔离。
+
+## 高分辨率时钟
+时钟作为一个游戏引擎最基本的模块，在很多方面都会使用到，如FPS统计，游戏时间线，物理系统等。
+时钟模块的主要作用是**获取当前时间**。
+C语言的`time.h`库提供了一些基本的时间获取函数，如下。
+
+```
+// 从 1970-01-01 00:00:00 GMT 以来消逝的秒数
+time_t seconds = time(NULL);
+
+// 获取时分秒结构
+struct tm* Current = localtime(&seconds);
+
+// 从程序启动到 clock() 调用，所消耗的CPU时间
+clock_t ticks = clock();
+
+// 转换成秒
+long ElapsedSecond = ticks / CLOCKS_PER_SEC;
+```
+上面这些函数只能提供*秒级精度*，对于一些对时间要求不高程序，可以直接使用这些函数。
+对游戏引擎而言，秒级精度是不够的，最少需要*毫秒级精度*。因此就需要使用到与平台相关的一些函数。
+
+**Win32**
+
+```
+// 包含 windows.h 
+static LARGE_INTEGER m_StartTime;
+static LONGLONG m_LastTime;
+static DWORD m_StartTick;
+
+void init()
+{
+	QueryPerformanceFrequency(&m_StartTime);
+	m_StartTick = GetTickCount();
+	m_LastTime = 0;
+}
+// 参考 OGRE getMilliseconds， 获取毫秒
+unsigned long getMilliseconds()
+{
+	LARGE_INTEGER frequency;
+	QueryPerformanceFrequency(&frequency);
+
+	LARGE_INTEGER endTime;
+	QueryPerformanceCounter(&endTime);
+
+	LONGLONG TimeOffset = endTime.QuadPart - m_StartTime.QuadPart;
+
+	// 毫秒：* 1000， 微秒：* 1000000
+	unsigned long Ticks = (unsigned long)(1000 * TimeOffset / frequency.QuadPart);
+
+	unsigned long check = GetTickCount() - m_StartTick;
+	signed long msecOff = (signed long)(Ticks - check);
+	if (msecOff < -100 || msecOff > 100)
+	{
+		LONGLONG adjust = (std::min)(msecOff * frequency.QuadPart / 1000, TimeOffset - m_LastTime);
+		m_StartTime.QuadPart += adjust;
+		TimeOffset -= adjust;
+
+		Ticks = (unsigned long)(1000 * TimeOffset / frequency.QuadPart);
+	}
+	
+	m_LastTime = TimeOffset;
+
+	return Ticks;
+}
+```
+**Unix/Linux**
+
+```
+// 包含 sys/time.h
+static timeval m_StartTime;
+
+void init()
+{
+	gettimeofday(&m_StartTime, NULL);
+}
+
+unsigned long getMilliseconds()
+{
+	timeval endTime;
+	gettimeofday(endTime, NULL);
+
+	// timeval 由 tv_sec(秒)， tv_usec(微秒) 共同组成
+	unsigned long elapsedTime = (endTime.tv_sec - m_StartTime.tv_sec) * 1000;
+	elapsedTime += (endTime.tv_usec - m_StartTime.tv_usec) / 1000;
+
+	return elapsedTime;
+}
+```
