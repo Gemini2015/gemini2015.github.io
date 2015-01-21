@@ -3,6 +3,7 @@ layout: post
 title: 平台独立层
 date: 2015-01-21 10:47:02
 categories: Game
+description: 平台独立层的结构与实现
 ---
 
 
