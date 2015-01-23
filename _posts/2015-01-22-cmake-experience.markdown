@@ -27,3 +27,24 @@ endforeach(rm_file)
 上面使用了CMake的正则表达式，匹配两个文件，分别为`.*/filename1.c`和`.*filename2.c`，其中`.*`代表了任意字符串，`filename1.c`是文件名。
 
 
+## 同一个工程同时生成静态库和动态库
+有了如标题所述的需求，在网上搜索了一下，发现大部分博客都是讲通过设置`OUTPUT_NAME`，使两个工程(一个动态库，一个静态库)输出同名二进制文件。但是我不希望同样的源码，要创建两个工程。
+可以使用下面的方法为使用一个工程同时生成动态库和静态库。
+
+```
+# 添加控制选项
+# BUILD_SHARED_LIBS 是CMake内置变量
+# 针对WIN32可以
+
+if(WIN32)
+	option(BUILD_SHARED_LIBS "Build Shared libs" ON)
+	option(BUILD_AS_DLL "Build as dll" ${BUILD_SHARED_LIBS})
+endif()
+
+add_library(libHello ${SRC_LIST})
+target_link_libraries(libHello ${EXTRA_LIB})
+
+if(BUILD_AS_DLL)
+	set_target_properties(libHello PROPERTIES COMPILE_DEFINITIONS BUILD_AS_DLL)
+endif()
+```
