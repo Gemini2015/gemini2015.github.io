@@ -249,3 +249,68 @@ unsigned long getMilliseconds()
 	return elapsedTime;
 }
 ```
+
+
+## 文件系统
+游戏引擎的一个重要的功能就是**资源管理**，而文件系统则是资源管理的基石。
+文件系统的主要作用是管理文件、文件夹，必须实现文件的存取，目录的创建、删除、读取等。
+
+#### 文件
+关于文件的存取，既可以使用C中的FILE相关操作函数，也可以使用C++中的文件流对象。
+当然各个操作系统也都提供了对应的用于文件操作的API。
+
+**Win32**
+
+```
+// #include<windows.h>
+HANDLE WINAPI CreateFile(
+  _In_      LPCTSTR lpFileName,
+  _In_      DWORD dwDesiredAccess,
+  _In_      DWORD dwShareMode,
+  _In_opt_  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+  _In_      DWORD dwCreationDisposition,
+  _In_      DWORD dwFlagsAndAttributes,
+  _In_opt_  HANDLE hTemplateFile
+);
+```
+**Unix/Linux**
+
+```
+//#include <fcntl.h>
+int open(const char *path, int flags, mode_t mode);
+```
+
+#### 目录(文件夹)
+Linux和Windows中都有`dirent.h`这个头文件，但是里面定义的函数却是不相同的。
+Linux中的`dirent.h`提供的函数能打开目录，关闭目录，遍历目录文件。
+而Windows中的`dirent.h`只提供了创建目录、删除目录、进入目录，已经获取当前路径等功能，并没有提供遍历目录文件的功能。
+Windows中遍历目录文件的函数在`io.h`中。
+
+**Win32**
+
+```
+// dirent.h
+int chdir(const char* path);
+int mkdir(const char* path);
+int rmdir(const char* path);
+char* getcwd(char* buf, int buffsize);
+
+// io.h
+intptr_t _findfirst(const char *pattern, struct _finddata_t *data);
+int _findnext(intptr_t id, struct _finddata_t *data);
+int _findclose(intptr_t id);
+```
+在`fileapi.h`文件中，定义了Windows关于文件和目录操作的API。
+
+**Unix/Linux**
+
+```
+// dirent.h
+DIR * opendir(const char *filename);
+struct dirent * readdir(DIR *dirp);
+int closedir(DIR *dirp);
+```
+
+> **OGRE的文件系统**
+> 在OGRE中，对于Win32平台，使用的是`dirent.h`和`io.h`中提供的函数`_findfirst、_findnext、_findclose`。
+> 对于Unix/Linux平台，则通过`dirent.h`中的`opendir、readdir、closedir`实现了上面3个函数。
