@@ -161,6 +161,40 @@ description: 平台独立层的结构与实现
 ```
 
 
+## 原子数据类型
+数据类型和平台、以及编译器相关，但是基本上不会涉及到平台相关的函数，对原子数据类型的确定，主要是通过对平台特定的数据类型使用`typedef`进行**类型定义**。
+
+```
+typedef unsigned int uint32;	// 4B
+typedef unsigned short uint16;	// 2B
+typedef unsigned char uint8;	// 1B
+typedef int int32;		// 4B
+typedef short int16;		// 2B
+typedef char int8;		// 1B
+```
+上面这些数据类型，针对大多数平台来说都是确定字节的。针对8个字节的整型，各个平台有些区别。
+
+**MSVC**
+
+```
+typedef unsigned __int64 uint64;	// 8B
+typedef __int64 int64;			// 8B
+```
+
+**其它编译器**
+
+```
+typedef unsigned long long uint64;	// 8B
+typedef long long int64;		// 8B
+```
+
+> 与数据相关的问题还包括**大小端**:
+> 大小端一般与处理器采用的架构相关。
+> Intel x86, MOS Technology 6502, Z80, VAX, PDP-11都是小端模式(Little Endian)。
+> Motorola 6800, Motorola 68000, PowerPC 970, System/370, SPARC(除V9外)为大端模式(Big Endian)。
+> ARM, PowerPC(除PowerPC 970外), DEC Alpha, SPARC V9, MIPS, PA-RISC, IA64的字节序是可配置的。
+
+
 ## 高分辨率时钟
 时钟作为一个游戏引擎最基本的模块，在很多方面都会使用到，如FPS统计，游戏时间线，物理系统等。
 时钟模块的主要作用是**获取当前时间**。
