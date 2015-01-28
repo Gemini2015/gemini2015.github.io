@@ -63,3 +63,11 @@ include_directories ( "D:/Program Files (x86)/Lua/include" )
 set(LUA_LIB "D:/Program Files (x86)/Lua/lib/lua51.lib")
 target_link_libraries(target ${LUA_LIB})
 ```
+
+
+## 设置安装路径前缀
+使用`install`命令安装项目的时候，如果路径给出的是**全路径**，那么会直接使用这个路径，如果给出的是相对路径，那么会加上`CMAKE_INSTALL_PREFIX`，默认情况下这个值为`C:/Program Files (x86)`。可以直接在CMakeLists里面设置这个值，也可以在CMake GUI里面设置。
+
+```
+set(CMAKE_INSTALL_PREFIX "D:/Program Files (x86)/" CACHE PATH "Project install directory" FORCE)
+```
