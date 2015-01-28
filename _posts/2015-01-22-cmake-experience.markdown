@@ -48,3 +48,18 @@ if(BUILD_AS_DLL)
 	set_target_properties(libHello PROPERTIES COMPILE_DEFINITIONS BUILD_AS_DLL)
 endif()
 ```
+
+
+## 设置头文件目录和静态库
+很多时候，我们会使用第三方库，因此，我们要在工程里面包含第三方库的头文件，链接第三方提供的静态链接库(如果有的话)。
+
+```
+# 包含头文件
+# include_directories 具有继承性
+# 当前 CMakeLists 里面包含的目录，会被 add_subdirectory 里面的 CMakeLists 继承
+include_directories ( "D:/Program Files (x86)/Lua/include" )
+
+# 链接库
+set(LUA_LIB "D:/Program Files (x86)/Lua/lib/lua51.lib")
+target_link_libraries(target ${LUA_LIB})
+```
