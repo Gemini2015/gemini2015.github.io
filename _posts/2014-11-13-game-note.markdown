@@ -54,3 +54,4 @@ description: 涉及到游戏各方面的备忘录
 - 国际化与本地化(I18n, L10n)
   **无论是否需要国际化，都应该尽量避免在游戏代码中，直接使用硬字符串。**对于需要国际化，而又不得不在源代码中使用硬字符串的软件，可以使用像`gettext`这样的函数库进行翻译。
   Linux/Unix下很容易安装`gettext`函数库，对于Windows环境，可以试试由[Michele Locati](https://github.com/mlocati)提供的[二进制版本](http://mlocati.github.io/gettext-iconv-windows/)。
+  当然，上面提到的硬字符串只是针对于会与用户进行交互的字符串，对于只是在程序内部使用的字符串，无需特殊处理。比如：程序中用来表示着色器变量名的字符串。
