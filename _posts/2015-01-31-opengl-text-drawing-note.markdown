@@ -46,3 +46,43 @@ description: 记录实现OpenGL文字绘制的过程
 - External leading
 - Bearing
 - Advance
+
+## 使用步骤
+可以将freetype当成这样一个黑箱：我们的应用程序负责提供字体文件，需要绘制的字符，以及相应的参数，freetype返回对应字符的位图，然后我们的应用程序再将位图绘制到输出设备上。
+可以按照下面提供的基本步骤来使用freetype：
+
+1.	**初始化库**
+	freetype的大部分操作都依赖于一个库(`FT_Library`)实例，一个库关联着若干个模块(`FT_Module`)和字体外观(`FT_Face`)。
+
+	```
+	// 创建一个变量
+	FT_Library library;
+
+	// 初始化库，该函数同时会注册一些缺省的模块
+	FT_Error error = FT_Init_FreeType(&library)
+
+	/*
+	或者也可以创建一个空库，然后手动注册模块
+	在这种情况下可以使用下面的函数
+	FT_New_Memory
+	FT_New_Library
+	FT_Add_Module
+	*/
+	```
+
+2. 	**载入字体文件**
+	一个字体文件可能对应若干个字体外观(`FT_Face`)，一般情况下，在载入字体文件的时候，总是选择第一个(index == 0)字体外观，然后根据字体外观的`num_faces`来获取该文件中的外观数。
+	使用`FT_New_Face`可以从一个指定文件载入字体，也可以使用`FT_New_Memory_Face`从一个内存地址处载入字体。
+
+	```
+	// 外观变量
+	FT_Face face;
+	char* font_file = "Arial.ttf";
+	int face_index = 0;
+	FT_Error error = FT_New_Face(library, font_file, face_index, &face);
+
+	/*
+	从内存中载入
+	FT_Error error = FT_New_Memory_Face(library, buf, size, face_index, &face);
+	*/
+	```
