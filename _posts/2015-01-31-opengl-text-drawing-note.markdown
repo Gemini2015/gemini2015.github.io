@@ -15,7 +15,7 @@ description: 记录实现OpenGL文字绘制的过程
 以下主要记录了使用freetype过程中的一些笔记。
 
 
-## 相关术语
+## FreeType相关术语
 对于相关术语，此处只列出条目，具体含义可以参考freetype官网上的[相关内容](http://www.freetype.org/freetype2/docs/glyphs/glyphs-1.html)。
 
 - 字体(font)
@@ -47,7 +47,7 @@ description: 记录实现OpenGL文字绘制的过程
 - Bearing
 - Advance
 
-## 使用步骤
+## FreeType使用步骤
 可以将freetype当成这样一个黑箱：我们的应用程序负责提供字体文件，需要绘制的字符，以及相应的参数，freetype返回对应字符的位图，然后我们的应用程序再将位图绘制到输出设备上。
 可以按照下面提供的基本步骤来使用freetype：
 
