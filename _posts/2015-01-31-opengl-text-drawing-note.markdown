@@ -89,8 +89,8 @@ description: 记录实现OpenGL文字绘制的过程
 
 3.	**设置像素尺寸**
 	载入字体之后，在获取字符映像之前，我们首先要设置像素尺寸。
-	当一个新的`FT_Face`对象建立时，对于可伸缩字体格式，`FT_Face`中`size`会默认设置为`(10, 10)`。而对于定长字体格式，这个大小是未定义的。
-	对于可伸缩字体格式，你可以将`size`设置成任意合理的值，对于定长格式，若是设置的`size`不在`FT_Face`的`available_sizes`数组中，则会引发错误。
+	当一个新的`FT_Face`对象建立时，对于可伸缩字体格式，`FT_Face`中`size`会默认设置为`(10, 10)`。而对于固定尺寸字体格式，这个大小是未定义的。
+	对于可伸缩字体格式，你可以将`size`设置成任意合理的值，对于固定尺寸格式，若是设置的`size`不在`FT_Face`的`available_sizes`数组中，则会引发错误。
 
 	```
 	FT_Face face;
@@ -115,11 +115,6 @@ description: 记录实现OpenGL文字绘制的过程
 	`FT_Face`中的`charmaps`表，记录了当前字体提供的字符映射表，可以使用预定义的一些枚举值来调用`FT_Select_CharMap`来选中某个字符映射表，也可以手动遍历`charmaps`，以符合要求的`charmap`调用`FT_Set_CharMap`来设置字符映射表。
 
 	```
-	// 获取字形索引
-	FT_Face face;
-	unsigned long charcode = '程';
-	unsigned int glyph_index = FT_Get_Char_Index(face, charcode);
-
 	// 选择字符映射表
 	FT_Face face;
 	FT_Error error = FT_Select_CharMap(face, FT_ENCODING_BIG5);
@@ -142,4 +137,26 @@ description: 记录实现OpenGL文字绘制的过程
 	{
 		FT_Error error = FT_Set_CharMap(face, dest);
 	}
+
+	// 获取字形索引
+	FT_Face face;
+	unsigned long charcode = '程';
+	unsigned int glyph_index = FT_Get_Char_Index(face, charcode);
+	```
+
+5.	**装载字形**
+	一旦获得了字形索引，便可以装载对应的字形映像。对于固定尺寸字体格式，每个字形都是一个位图。对于可伸缩字体格式，则使用名为轮廓的矢量形状来描述每一个字形。当然，也存在一些特殊的方式来表示字形。
+	字形映像存储在字形槽中，一个`FT_Face`只有一个字形槽。所以每次只能获取一个字符串中的一个字符对应的字形。
+	对于固定尺寸的字体格式，由于获取到的字形是位图，所以可以直接使用，而对于可伸缩格式的字体，装载的是一个轮廓，因此还必须通过`FT_Render_Glyph`函数将轮廓渲染成位图，方可使用。
+
+	```
+	// 装载字形
+	FT_Face face;
+	unsigned int glyph_index;
+	signed int load_flags;
+	FT_Error error = FT_Load_Glyph(face, glyph_index, load_flags);
+
+	// 渲染轮廓
+	FT_Render_Mode render_mode;
+	FT_Error error = FT_Render_Glyph(face->glyph, render_mode);
 	```
