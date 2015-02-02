@@ -148,6 +148,7 @@ description: 记录实现OpenGL文字绘制的过程
 	一旦获得了字形索引，便可以装载对应的字形映像。对于固定尺寸字体格式，每个字形都是一个位图。对于可伸缩字体格式，则使用名为轮廓的矢量形状来描述每一个字形。当然，也存在一些特殊的方式来表示字形。
 	字形映像存储在字形槽中，一个`FT_Face`只有一个字形槽。所以每次只能获取一个字符串中的一个字符对应的字形。
 	对于固定尺寸的字体格式，由于获取到的字形是位图，所以可以直接使用，而对于可伸缩格式的字体，装载的是一个轮廓，因此还必须通过`FT_Render_Glyph`函数将轮廓渲染成位图，方可使用。
+	获取到位图之后，可以通过`face->glyph->bitmap`来访问位图数据，`face->glyph->bitmap_left`和`face->glyph->bitmap_top`用来指示起始位置。
 
 	```
 	// 装载字形
@@ -159,4 +160,15 @@ description: 记录实现OpenGL文字绘制的过程
 	// 渲染轮廓
 	FT_Render_Mode render_mode;
 	FT_Error error = FT_Render_Glyph(face->glyph, render_mode);
+	```
+
+6.	**字形变换**
+	可以通过调用`FT_Set_Transform`函数来对可伸缩字体进行仿射变换。
+	需在字形由轮廓渲染成位图之前，设置字形变换。
+
+	```
+	FT_Face face;
+	FT_Matrix matrix; // 仿射矩阵
+	FT_Vector vector; // 仿射变换后进行平移
+	FT_Error error = FT_Set_Transform(face, &matrix, &vector);
 	```
