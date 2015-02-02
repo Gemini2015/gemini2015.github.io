@@ -86,3 +86,60 @@ description: 记录实现OpenGL文字绘制的过程
 	FT_Error error = FT_New_Memory_Face(library, buf, size, face_index, &face);
 	*/
 	```
+
+3.	**设置像素尺寸**
+	载入字体之后，在获取字符映像之前，我们首先要设置像素尺寸。
+	当一个新的`FT_Face`对象建立时，对于可伸缩字体格式，`FT_Face`中`size`会默认设置为`(10, 10)`。而对于定长字体格式，这个大小是未定义的。
+	对于可伸缩字体格式，你可以将`size`设置成任意合理的值，对于定长格式，若是设置的`size`不在`FT_Face`的`available_sizes`数组中，则会引发错误。
+
+	```
+	FT_Face face;
+	int width = 0; // 为零表示与height相同
+	int height = 16 * 64; // 以 1/64 点为单位的字符高度
+	int ResolutionX = 300; // 水平分辨率
+	int ResolutionY = 300; // 垂直分辨率
+	FT_Error error = FT_Set_Char_Size(face, width, height, ResolutionX, ResolutionY);
+
+	/*
+	或者可以直接设置像素大小
+	FT_Face face;
+	int WidthInPixel = 0;
+	int HeightInPixel = 16;
+	FT_Error error = FT_Set_Pixel_Sizes(face, WidthInPixel, HeightInPixel);
+	*/
+	```
+
+4.	**字符码到字形索引**
+	字符码指的是某个字符在某种编码下的数值。比如`A`在ASCII中的字符码为`64`。字形索引是字体文件内部用来查找字形的索引。可以通过字体文件提供的字符映射表来将字符码转换成对应的字形索引。通常一个字体文件会包含多个字符映射表，以提供对多种常用的字符编码的支持。
+	当一个`FT_Face`对象创建时，会默认选择Unicode字符表，如果字体没包含Unicode字符表，FreeType会尝试在字形名的基础上模拟一个(对于某些字体，其模拟效果可能不尽人意)。
+	`FT_Face`中的`charmaps`表，记录了当前字体提供的字符映射表，可以使用预定义的一些枚举值来调用`FT_Select_CharMap`来选中某个字符映射表，也可以手动遍历`charmaps`，以符合要求的`charmap`调用`FT_Set_CharMap`来设置字符映射表。
+
+	```
+	// 获取字形索引
+	FT_Face face;
+	unsigned long charcode = '程';
+	unsigned int glyph_index = FT_Get_Char_Index(face, charcode);
+
+	// 选择字符映射表
+	FT_Face face;
+	FT_Error error = FT_Select_CharMap(face, FT_ENCODING_BIG5);
+
+	// 手动选择字符映射表
+	FT_Face face;
+	FT_CharMap dest = NULL;
+	FT_CharMap charmap = NULL;
+	for(int i = 0; i < face->num_charmaps; i++)
+	{
+		charmap = face->charmaps[i];
+		if(charmap->platform_id = dest_platform_id
+			&& charmap->encoding_id == dest_encoding_id)
+			{
+				dest = charmap;
+				break;
+			}
+	}
+	if(dest != NULL)
+	{
+		FT_Error error = FT_Set_CharMap(face, dest);
+	}
+	```
