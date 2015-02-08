@@ -186,6 +186,10 @@ description: 记录实现OpenGL文字绘制的过程
 	FT_Error error = FT_Set_Transform(face, &matrix, &vector);
 	```
 
+
+# FreeType实践
+***
+
 ## FreeType示例
 [此处](/etc/FreeTypeExample.cpp)，提供一个本人写的简单示例，从控制台输入字体文件名和一个字符，程序打印出字符对应的字形位图。
 
@@ -197,3 +201,9 @@ description: 记录实现OpenGL文字绘制的过程
 > **OGRE的字符处理**
 > OGRE也是按照字形最大的那个来分配空间，但是OGRE在计算内存用量的时候有个小技巧。
 > 在求出最大宽高`max_width, max_height`之后，求出理想情况下的内存用量`rawSize`，假设为正方形的纹理，就可得出正方形的边长`tex_side`，然后为了保证不会出现字形跨行的情况，给`tex_side`加了一个宽高中的最大值。因为一般情况下纹理的宽高都会取2的幂，所以求出最接近`tex_side`的`roundUpSize`。有时候`roundUpSize * roundUpSize`可能会比`tex_side * tex_side`大很多，所以OGRE在这里判断了是否应该以`roundUpSize * 0.5`作为高。接下来就是将字形数据拷贝到纹理上。
+
+## ZFXEngine整合FreeType
+我们使用FreeType载入字体文件，获取字形映像，并保存到内存纹理中。[当前版本](https://github.com/Gemini2015/ZFXEngine/tree/ce38a5a0af5f50eaa56f8ed84f008080710b8290 'ZFXEngine Source Code')的ZFXEngine提供的`SkinManager`接口只能从文件载入纹理，所以必须修改接口以实现从内存中载入纹理。同时，应创建一个`Font`类对字体进行抽象，以及`FontManager`管理字体。
+
+> 原始版本的ZFXEngine是使用D3D实现的，所以在接口的设计上主要考虑的D3D，所以在用OpenGL实现时，经常要修改接口。
+
