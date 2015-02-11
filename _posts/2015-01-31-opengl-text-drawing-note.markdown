@@ -216,3 +216,85 @@ description: 记录实现OpenGL文字绘制的过程
 > **OGRE的字符区间**
 > OGRE用`CodePointRange(33, 255)`来表示一段字符区间，OGRE的每一个Font都有一个区间列表，表面对于某个字号的某个字体，有哪些字形被绘制到了内存纹理中。OGRE没有对字符数量和字号大小做检验，对于20000个汉字，设置100的大小，运行时内存分配失败，直接空指针。
 > 个人感觉，对于中文来说，`CodePointRange`似乎也不太实用，Unicode中的中文（0x4E00 - 0x9FCC，20000多汉字。除这区间以外，其他区间还有大量扩展）没有按使用频率分段，所以无法精简到某个区间。
+
+### 固定大小纹理
+鉴于一张纹理无法存储所有汉字，我决定使用多张纹理来存储。
+使用固定大小的纹理（我选择的是`2048 * 2048`），将一个大的字符区间转换成若干个小的字符区间。一张纹理上可以存储多个区间内的字符。
+**实现**
+
+```
+struct Range
+{
+	DWORD from;	// 字符区间
+	DWORD to;
+	UINT nTexID;	// 保存该区间字符的纹理ID
+};
+typedef vector<Range> RangeList;
+
+RangeList tempRangeList;	// 用户设置的字符区间表
+RangeList InteralRangeList;	// 最后程序内部保存的字符区间表
+
+// 首先遍历每个字符。获取最大宽高，作为填充格子的大小
+int max_height = 0, max_width = 0;
+GetCellSize(tempRangeList, &max_width, &max_height);
+
+/*
+ 	开始填充格子
+*/
+// 先创建一个纹理ID，
+UINT nTexID = CreateTexture();	
+// 创建一个内存纹理，等内存纹理填充完毕之后，再传输到硬件缓冲上。
+int width = 2048;	// 内存纹理宽度
+int height = 2048;	// 内存纹理高度
+Byte *pBuf = new Byte[width * height];
+
+int penx = 0, peny = 0;	// 画笔，表示内存纹理的绘制位置
+
+// 遍历区间
+foreach range in tempRangeList
+{
+	// 遍历字符
+	DWORD from = range.from;
+	DWORD to = from;
+	for(DWORD codepoint = range.from; codepoint <= range.to; codepoint++, to++)
+	{
+		// 调用FreeType载入字形
+		FT_GlyphSlot slot = LoadGlyph(codepoint);
+
+		// 当前内存纹理已填满
+		if(IsImageBufferFull)
+		{
+			UpdateTexture(nTexID, pBuf);
+
+			// 保存当前区间
+			AddRange(InteralRangeList, from, to - 1, nTexID);
+			from = to;
+
+			// 创建一个新的纹理ID
+			nTexID = CreateTexture();
+			
+			// 更新画笔位置
+			penx = peny = 0;
+		}
+
+		// 一行填满，换行
+		if(IsImageNeedChangeRow)
+		{
+			penx = 0;
+			peny = peny + max_width;
+		}
+
+		// 填充字形数据
+		CopyGlyphToImage(pBuf, penx, peny, slot);
+
+		// 保存该字形UV数据
+		AddCodePointUV(codepoint, penx, peny, slot);
+
+		// 画笔移动到下一格
+		penx = penx + max_width;
+	}
+
+	//一个区间结束，也应当保存
+	AddRange(InteralRangeList, from, to - 1, nTexID);
+}
+```
