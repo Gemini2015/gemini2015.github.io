@@ -328,3 +328,79 @@ TexGlyph_Map m_texGlyphMap;
 通过两级映射，可以解决字符区间重合的问题，同时，冗余度也较小。但是，目前还不知道这种解决办法对性能的影响。
 
 上面采用多纹理来存储字符映像，虽然可以解决单个字符区间太大的问题，但是可能会增加纹理切换的时间消耗。当然，极端情况下，可以将纹理尺寸设置足够大，以保证一张纹理就能把所有字符存储下，也可以解决纹理切换的问题，主要还是具体情况，具体取舍。
+
+### 细节部分
+今天花了一整天调试上面的实现，遇到了一些问题，在此记录一下。
+
+1. 	Y轴方向问题
+	在向内存纹理绘制字形的时候，逻辑上y轴是从上向下的，因此其UV坐标满足D3D的屏幕坐标系，但是OpenGL的屏幕坐标系Y轴为从下向上的。故在应用程序使用字形UV的时候，应该调整Y轴方向。
+
+2.	字形基线
+	在原始的实现中，我没有考虑基线，直接将字形位图的（0,0）点对应纹理格子的（0,0）点，UV也是这样计算的。因为一个字形的位图尺寸为能包裹字形的最小矩形框，所以在每个纹理格子中，字形位图都是偏左上的，最后应用程序绘制字符的时候，也会显得偏左上，显得不美观。比如字符“一”，本来正常情况下，在垂直方向上应该接近居中，但是如果不考虑基线直接绘制的话，就会绘制在格子顶部。
+	在这个地方参考了OGRE的做法，得以保证字形在统一的基线上绘制。
+
+3.	字符显示尺寸
+	经过封装之后，应用程序在使用上述实现时，只能获取到字体大小Size，字符对应纹理，字符UV。
+	很明显`O`与`i`的宽度是不等的，每一个字符的UV对应了字符的实际位图，也就是说，`O`的UV组成的矩形要比`i`的UV组成的矩形宽。
+	怎样确定绘制出来的字符的宽度和高度？肯定不能使用(Size * Size)这样的尺寸，使用这样的尺寸会将`i`拉宽，因而失真。
+	我采取的办法是根据字符的纵横比结合Size来计算最后显示的尺寸。
+
+	```
+	int x, y;		// pen pos
+	float swidth;		// canvas size
+	float sheight;
+	
+	float width = uv.right - uv.left;
+	float height = uv.bottom - uv.top;
+	float aspect = height / width;
+	if(width > height)
+	{
+		// 比如 "一"
+		float vertex[6][4] = {
+			// triangle 1
+			{ x / swidth, 			(y + size * (1 + aspect) / 2) / sheight, uv.left, uv.top },
+			{ (x + size) / swidth, 	(y + size * (1 + aspect) / 2) / sheight, uv.right, uv.top },
+			{ x / swidth, 			(y + size * (1 - aspect) / 2) / sheight, uv.left, uv.bottom },
+
+			// triangle 2
+			{ (x + size) / swidth, 	(y + size * (1 + aspect) / 2) / sheight, uv.right, uv.top },
+			{ (x + size) / swidth, 	(y + size * (1 - aspect) / 2) / sheight, uv.right, uv.bottom },
+			{ x / swidth, 			(y + size * (1 - aspect) / 2) / sheight, uv.left, uv.bottom },
+		}
+	}
+	else
+	{
+		// 比如 "|"
+		float vertex[6][4] = {
+			// triangle 1
+			{ x / swidth, 					(y + size) / sheight, uv.left, uv.top },
+			{ (x + size * aspect) / swidth, (y + size) / sheight, uv.right, uv.top },
+			{ x / swidth, 					y / sheight, uv.left, uv.bottom },
+
+			// triangle 2
+			{ (x + size * aspect) / swidth, (y + size) / sheight, uv.right, uv.top },
+			{ (x + size * aspect) / swidth, y / sheight, uv.right, uv.bottom },
+			{ x / swidth, 					y / sheight, uv.left, uv.bottom },
+		}
+	}
+	```
+
+4.	字符间距
+	在求得字符的显示尺寸之后，字符能正常显示，但是又会出现一个问题，字符间距需要调整。字符间距与画笔的步进有关。画笔的步进由字幅宽度，字偶距（Kerning），自定义间距组成。
+	一个解决办法是修改字符绘制函数，返回当前绘制的字符的宽度（垂直绘制的话，返回高度）。
+	对上面的代码进行修改，即可获得画笔步进。
+
+	```
+	if(width > height)
+	{
+		// ...
+		
+		*advance = size;
+	}
+	else
+	{
+		// ...
+
+		*advance = size * aspect;
+	}
+	```
