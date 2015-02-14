@@ -4,10 +4,10 @@ sitemap:
   changefreq: 'weekly'
 ---
 
-<div class="container-fluid main-body">
+<div class="container main-body">
 
     <div class="row">
-        <div class="col-xs-7">
+        <div class="col-xs-12 col-sm-7">
             <div clsss="row post-list">            
         
                 {% for post in paginator.posts %}
@@ -22,7 +22,7 @@ sitemap:
                 {% endfor %}
             </div>
             <div class="row paginator">
-                <div class="col-xs-6 text-left">
+                <div class="col-xs-6 col-sm-6 text-left">
                     {% if paginator.previous_page %}
                 
                         {% if paginator.previous_page == 1 %}
@@ -34,7 +34,7 @@ sitemap:
                     {% endif %}
                 </div>
                 
-                <div class="col-xs-6 text-right">
+                <div class="col-xs-6 col-sm-6 text-right">
                     {% if paginator.next_page %}
                     
                     <a href="{{ paginator.next_page_path }}" class="btn btn-primary btn-lg" role="button"><span class="glyphicon glyphicon-arrow-right"></span> &nbsp;&nbsp;OLD &nbsp;&nbsp;<span class="glyphicon glyphicon-arrow-right"></span></a>
@@ -45,10 +45,9 @@ sitemap:
             
             </div>
         </div>
-        <div class="col-xs-1">
-            
-        </div>
-        <div class="col-xs-4 side-info">
+        <!-- <div class="col-xs-12 col-sm-1"></div> -->
+
+        <div class="col-xs-12 col-sm-5 side-info">
             <div class="row">
                 <div class="col-xs-12">
                     <img src="{{ "/img/me.png" | prepend: site.baseurl }}" class="img-thumbnail photo" alt="ChrisCheng">

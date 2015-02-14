@@ -276,7 +276,6 @@ a:visited { color: #205caa; }
 
 .main-body
 {
-  width: 70%;
   margin-left: auto;
   margin-right: auto;
 }
@@ -292,14 +291,10 @@ a:visited { color: #205caa; }
 .site-title,
 .site-title:hover,
 .site-title:visited {
-  display: block;
   color: #333;
   font-size: 26px;
   letter-spacing: -1px;
-  float: left;
   line-height: 60px;
-  position: relative;
-  z-index: 1;
 }
 
 .site-nav {
@@ -317,13 +312,11 @@ a:visited { color: #205caa; }
 
 .site-description
 {
-  display: block;
   color: #333;
   font-size: 16px;
   letter-spacing: 0px;
-  float: left;
+  margin-left: 10px;
   line-height: 60px;
-  position: relative;
 }
 
 .site-nav
@@ -401,7 +394,7 @@ a:visited { color: #205caa; }
 
 .footer-url > a
 {
-  margin-left: 20px;
+  margin-left: 10px;
 }
 
 .mail-icon
