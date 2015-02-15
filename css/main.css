@@ -13,7 +13,8 @@ body {
   font-size: 16px;
   line-height: 1.5;
   font-weight: 300;
-  background-color: #fdfdfd;
+  background-image: url(/img/tex.png);
+  /*background-color: #eee;*/
 }
 
 h1, h2, h3, h4, h5, h6 { font-size: 100%; font-weight: 400; }
@@ -280,6 +281,17 @@ a:visited { color: #205caa; }
   margin-right: auto;
 }
 
+.main-row
+{
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  border-left: 1px solid #eee;
+  border-right: 1px solid #eee;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+  background-color: #fff;
+}
+
 .site-header {
   border-top: 5px solid #333;
   border-bottom: 1px solid #e8e8e8;
@@ -368,32 +380,42 @@ a:visited { color: #205caa; }
 }
 
 .site-footer {
-  border-top: 1px solid #e8e8e8;
   margin-top: 0px;
-  padding: 5px ;
-  line-height: 40px;
+  /*padding: 5px ;*/
+  line-height: 30px;
 }
 
 .site-footer p {
   font-size: 15px;
   letter-spacing: -.3px;
-  color: #828282;
+  font-size: 20px
+}
+
+.site-row
+{
+  border: 1px solid #eee;
+  border-radius: 5px;
+  /*border-top-left-radius: 5px;
+  border-top-right-radius: 5px;*/
+  background-color: #fff;
 }
 
 .footer-heading {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 300;
   letter-spacing: -.5px;
-  margin-bottom: 15px;
+  padding: 10px 0px;
 }
 
 .footer-url
 {
   text-align: right;
+  padding: 10px 10px;
 }
 
 .footer-url > a
 {
+  font-size: 20px;
   margin-left: 10px;
 }
 
