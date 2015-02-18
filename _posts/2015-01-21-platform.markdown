@@ -357,3 +357,5 @@ int closedir(DIR *dirp);
 > **OGRE的文件系统**
 > 在OGRE中，对于Win32平台，使用的是`dirent.h`和`io.h`中提供的函数`_findfirst、_findnext、_findclose`。
 > 对于Unix/Linux平台，则通过`dirent.h`中的`opendir、readdir、closedir`实现了上面3个函数。
+
+### 窗口系统
