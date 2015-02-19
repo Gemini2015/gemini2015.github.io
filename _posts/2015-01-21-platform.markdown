@@ -21,10 +21,6 @@ description: 平台独立层的结构与实现
 
 ## 平台检测
 个人认为平台检测主要是**通过系统宏定义进行预处理**。
-如在Windows平台常见的`WIN32、_WIN32、__WIN32__`。常用下面的方法来区分与平台相关的代码。
-
-```
-// platform.h
 #if defined(WIN32)
 
 // Win32 Platform
@@ -358,4 +354,5 @@ int closedir(DIR *dirp);
 > 在OGRE中，对于Win32平台，使用的是`dirent.h`和`io.h`中提供的函数`_findfirst、_findnext、_findclose`。
 > 对于Unix/Linux平台，则通过`dirent.h`中的`opendir、readdir、closedir`实现了上面3个函数。
 
-### 窗口系统
+## 窗口系统
+
