@@ -355,4 +355,26 @@ int closedir(DIR *dirp);
 > 对于Unix/Linux平台，则通过`dirent.h`中的`opendir、readdir、closedir`实现了上面3个函数。
 
 ## 窗口系统
+应用程序对于窗口的操作，主要集中在创建、删除窗口，查询、设置属性等。
 
+**Win32**
+
+```
+// windows.h
+
+// 注册窗口类
+WNDCLASS wndClass;
+RegisterClass(&wndclass);
+
+//创建窗口
+HWND hwnd = CreateWindow("WndClassName", "WindowName", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
+
+// 显示（隐藏）窗口
+ShowWindow(hwnd, SW_SHOW); // ShowWindow(hwnd, SW_HIDE);
+
+// 获取窗口尺寸
+GetWindowRect(hwnd, &rect);
+
+// 获取客户区域尺寸
+GetClientRect(hwnd, &rect);
+```
