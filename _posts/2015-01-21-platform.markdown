@@ -378,3 +378,5 @@ GetWindowRect(hwnd, &rect);
 // 获取客户区域尺寸
 GetClientRect(hwnd, &rect);
 ```
+
+## 设备IO
