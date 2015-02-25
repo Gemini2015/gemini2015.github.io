@@ -21,23 +21,34 @@ description: 平台独立层的结构与实现
 
 ## 平台检测
 个人认为平台检测主要是**通过系统宏定义进行预处理**。
+
+**Win32**
+
+```
 #if defined(WIN32)
 
 // Win32 Platform
 #include "Win32Window.h"
 #include "Win32FileSystem.h"
 #include "Win32Timer.h"
+```
 
-#elif defined(__linux)
+**Linux**
+
+```
+#if defined(__linux)
 
 // Linux Platform
+```
 
-#elif defined(__MACOSX__)
+**Mac OS X**
+
+```
+#if defined(__MACOSX__)
 
 // Mac OS X
-
-#endif
 ```
+
 项目构建工具也有**区分平台**的功能，如CMake本身也定义了一些宏用于表明当前要构建的平台。
 从Qt的宏定义文件中，我们可以得到一些平台的系统宏定义。
 
