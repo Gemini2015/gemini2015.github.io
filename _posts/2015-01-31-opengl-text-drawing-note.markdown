@@ -410,3 +410,84 @@ TexGlyph_Map m_texGlyphMap;
 
 -	字符颜色还未实现，字符背景与底色没有混合。现在绘制出的字符都是黑底白字，下一步应该实现字体颜色设置，并且将字符背景色设成透明。
 -	目前字符是在2D模式下绘制的，后面可能还会涉及到3D模式，绘制到物体表面。
+
+### 字符颜色与背景混合
+参照OGRE完成了字符颜色。
+
+#### FreeType渲染模式
+FreeType在渲染字符的时候有多种渲染模式，常用的有两种，一种是`FT_RENDER_MODE_NORMAL`，每个像素为一个`8bit`的灰度值。另一种是`FT_RENDER_MODE_MONO`，每个像素只占`1bit`。
+
+#### 字符数据流
+
+1.	使用`FT_RENDER_MODE_NORMAL`模式，由FreeType生成每个字符的字符映像，每个字符映像为一张小位图，该位图的每个像素为1个字节大小的灰度值。
+2.	创建一个数组作为内存纹理，将每个字符映像都“收集”到这张内存纹理上。每个字符映像的一个像素对应该数组的一个字节。
+3.	将内存纹理传输到OpenGL或D3D的纹理缓冲区，生成纹理对象。纹理对象的像素格式为RGBA。
+
+#### 原有实现
+在之前的实现中，每个字符映像的一个像素对应内存纹理的一个字节。
+
+```
+// 内存纹理
+unsigned char* pDest;
+// 字符映像
+unsigned char* pGlyphBmp;
+// 填充一个字符映像
+for(int j = 0; j < GlyphHeight; j++)
+{
+	for(int i = 0; i < GlyphWidth; i++)
+	{
+		pDest[destRow * destPitch + destCol] = pGlyphBmp[j * GlyphPitch + i];
+	}
+}
+```
+以OpenGL为例，我们是这样将内存纹理传输到OpenGL的。
+
+```
+glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texSize, texSize, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pData);
+```
+内部格式为`RGBA`，数据源格式为`GL_LUMINANCE`（即代表灰度值）。对于每个内存纹理像素的灰度值`val`，经过转换之后在OpenGL中为`RGBA(val, val, val, 1.0)`。
+
+#### 改进版本
+在改进的版本中，每个字符映像的一个像素对应内存纹理的两个字节。一个字节作为灰度值，另一个字节作为Alpha值。
+
+```
+// 内存纹理
+unsigned char* pDest;
+// 字符映像
+unsigned char* pGlyphBmp;
+// 填充一个字符映像
+for(int j = 0; j < GlyphHeight; j++)
+{
+	for(int i = 0; i < GlyphWidth; i++)
+	{
+		pDest[destRow * destPitch + destCol] = pGlyphBmp[j * GlyphPitch + i];
+		pDest[destRow * destPitch + destCol + 1] = pGlyphBmp[j * GlyphPitch + i];
+	}
+}
+```
+还是以OpenGL为例，将内存纹理传输到OpenGL的过程也需要修改。
+
+```
+glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texSize, texSize, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, pData);
+```
+数据源格式变为`GL_LUMINANCE_ALPHA`，这样以来，经过转换之后再OpenGL中就变为`RGBA(val, val, val, alpha)`。
+
+字符绘制的时候也需要修改。之前绘制每个字符的时候，使用了6个顶点构成两个三角形来绘制一个字符，顶点数据只包括顶点坐标和纹理坐标。改进之后，顶点数据增加3个浮点值用来表示RGB颜色。
+值得注意的是，在绘制字符的时候，需要关闭光照，否则无法为字符添加颜色。
+
+#### 字符与背景混合
+在不启用混合的情况下，绘制出来的每个字符都有一个背景色。启用混合，并且通过使用前面得到的alpha值，可以实现字符与背景混合，消除字符背景色。
+以OpenGL为例。
+
+```
+// 启用混合
+glEnable(GL_BLEND);
+// 设置混合方式
+glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+// 绘制
+glDrawArrays(GL_TRIANGLES, 0, 6);
+
+// 关闭混合
+glDisable(GL_BLEND);
+```
