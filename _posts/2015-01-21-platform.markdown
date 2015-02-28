@@ -18,6 +18,7 @@ description: 平台独立层的结构与实现
 - 网络
 - 线程操作
 - 设备IO
+- 实现细节
 
 ## 平台检测
 个人认为平台检测主要是**通过系统宏定义进行预处理**。
@@ -393,3 +394,31 @@ GetClientRect(hwnd, &rect);
 ## 设备IO
 对于大部分应用程序而言，其输出设备主要是显示器、音箱（或耳机），输入设备则种类较多：键盘、鼠标、游戏杆、游戏手柄、摄像头、麦克风等。一个典型的跨平台的人机接口函数库如OIS（Object Oriented Input System，面向对象输入系统）。
 
+
+## 实现细节
+在使用特定语言具体实现一个平台独立层，有很多细节部分需要考虑。下面将记录本人遇到的一些问题。
+
+#### 函数返回值
+参考Win32的API设计，可以发现大部分函数都用`HRESULT`作为返回值类型，并且定义了若干个宏来表示函数运行状态。如`S_OK`代表运行正常，`E_FAIL`代表未知错误，`E_OUTOFMEMORY`代表内存不足，`E_INVALIDARG`代表非法参数。
+在`winerror.h`中有`HRESULT`与相关错误代码的定义，`HRESULT`本质上是一个4字节值，所以我们在非Win32平台下，可以定义自己的`HRESULT`类型。
+
+```
+#if !defined(_WIN32) && !defined(PLATFORM_HRESULT_DEFINE) \
+    && !defined(_HRESULT_DEFINED) && !defined(__midl)
+#define PLATFORM_HRESULT_DEFINE
+
+// 定义4字节整形
+typedef long int32;
+
+// 定义 HRESULT 类型
+typedef long HRESULT;
+
+/*
+  还可以参照winerror.h定义一些工具宏，以及常用错误代码
+  如  MAKE_HRESULT
+      SUCCEEDED
+      FAILED
+*/
+
+#endif
+```
