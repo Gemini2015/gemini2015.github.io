@@ -281,7 +281,7 @@ unsigned long getMilliseconds()
 
 ```
 // 包含 sys/time.h
-static timeval m_StartTime;
+static struct timeval m_StartTime;
 
 void init()
 {
@@ -290,8 +290,8 @@ void init()
 
 unsigned long getMilliseconds()
 {
-	timeval endTime;
-	gettimeofday(endTime, NULL);
+	struct timeval endTime;
+	gettimeofday(&endTime, NULL);
 
 	// timeval 由 tv_sec(秒)， tv_usec(微秒) 共同组成
 	unsigned long elapsedTime = (endTime.tv_sec - m_StartTime.tv_sec) * 1000;
