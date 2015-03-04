@@ -94,6 +94,22 @@ a:visited { color: #205caa; }
   margin-top: 5px;
 }
 
+.navbar-title
+{
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #eee;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  z-index: 15;
+}
+
+.navbar-title button
+{
+  margin: 5px 5px 0px 5px;
+  font-size: 16px;
+}
+
 .post-content { margin: 0 0 30px; }
 
 .post-content > * { margin: 20px 0; }

@@ -15,5 +15,44 @@
         <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
         <script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 
+        <script type="text/javascript" src="{{ "/js/stickUp.min.js" | prepend: site.baseurl }}"></script>
+
+        <script type="text/javascript">
+            jQuery(function($) {
+                $(document).ready( function() {
+
+                    // post page ?
+                    if($('.navbar-title').length > 0)
+                    {
+                        // add Top button
+                        $('body').attr('id','body-top');
+                        var top = '<button type="button" class="btn btn-success" data="body-top">Top</button>';
+                        $('#navbar-list').append(top);
+
+                        // make navbar list
+                        $('article').children('h2').each(function(index, elem){
+                            var btn = '<button type="button" class="btn btn-primary" data="' + $(elem).attr('id') + '">'+ $(elem).text() +'</button>';
+                            $('#navbar-list').append(btn);
+                        });
+
+                        $('#navbar-list').children('button').each(function(index, elem){
+                            $(elem).click(function(){
+                                var id = $(elem).attr('data');
+                                var dst = $('#'+id).offset().top - $('.navbar-title').outerHeight(true) - 10;
+                                if(dst < 0)
+                                {
+                                    dst = 0;
+                                }
+                                $("html,body").animate({scrollTop:dst},600);
+                            });
+                        });
+
+                        // add stickUp
+                        $('.navbar-title').stickUp();
+                    }
+                });
+              });
+        </script>
+
     </body>
 </html>

@@ -10,6 +10,11 @@ layout: default
         <p class="meta">{{ page.date | date: "%b %-d, %Y" }}{% if page.author %} • {{ page.author }}{% endif %}{% if page.meta %} • {{ page.meta }}{% endif %}</p>
       </header>
 
+      <div class="navbar-title">
+        <p id="navbar-list">
+        </p>
+      </div>
+
       <article class="post-content">
         {{ content }}
       </article>
@@ -30,6 +35,7 @@ layout: default
       <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
       <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span>
       </a>
+
     </div> <!-- col-12 -->
   </div> <!-- row -->
 </div> <!-- container -->
