@@ -96,3 +96,23 @@ configure_file(
 #cmakedefine PLATFORM_LINUX
 ```
 如果 CMakeLists.txt 中定义了`PLATFORM_WIN32`变量，那么`#cmakedefine PLATFORM_WIN32`就会变成C++的宏定义语句`#define PLATFORM_WIN32`。
+
+## Linux使用 C++ 11
+在Linux下编译下面的代码时出错。
+
+```
+typedef std::map<key, value> Dict_Map;
+Dict_Map::iterator it = DictMap.begin();
+while(it != DictMap.end())
+{
+	it = DictMap.erase(it);
+}
+```
+出错提示是`erase函数没有返回值`。
+查看源码，发现`#if __cplusplus >= 201103L`时，`iterator erase(const_iterator __position)`。否则，`void erase(iterator __position)`。
+改成使用 C++ 11 就好了。
+
+```
+# Use C++11 in linux
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=gnu++0x")
+```
