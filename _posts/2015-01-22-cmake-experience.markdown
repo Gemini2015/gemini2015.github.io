@@ -76,3 +76,23 @@ target_link_libraries(target ${LUA_LIB})
 ```
 set(CMAKE_INSTALL_PREFIX "D:/Program Files (x86)/" CACHE PATH "Project install directory" FORCE)
 ```
+
+## 生成配置头文件
+一般可以用CMake来进行平台检测，那么CMake的检测结果如何告诉C++工程呢？CMake提供了`configure_file`命令。
+`configure_file`命令输入一个文本文件，处理文本文件中包含的CMake的指令，然后生成一个文本文件。
+
+```
+configure_file(
+	"${PROJECT_SOURCE_DIR}/platform/config.h.in"
+	"${PROJECT_BINARY_DIR}/config.h"
+	)
+```
+
+```
+/*
+	config.h.in 文件
+*/
+#cmakedefine PLATFORM_WIN32
+#cmakedefine PLATFORM_LINUX
+```
+如果 CMakeLists.txt 中定义了`PLATFORM_WIN32`变量，那么`#cmakedefine PLATFORM_WIN32`就会变成C++的宏定义语句`#define PLATFORM_WIN32`。
