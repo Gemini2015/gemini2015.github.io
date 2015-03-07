@@ -59,6 +59,11 @@ endif()
 # 当前 CMakeLists 里面包含的目录，会被 add_subdirectory 里面的 CMakeLists 继承
 include_directories ( "D:/Program Files (x86)/Lua/include" )
 
+# 库目录
+# eg. 链接 Linux 下的 X11
+link_directories(/usr/include/X11)
+SET(SYS_LIB_LIST "x11")
+
 # 链接库
 set(LUA_LIB "D:/Program Files (x86)/Lua/lib/lua51.lib")
 target_link_libraries(target ${LUA_LIB})
