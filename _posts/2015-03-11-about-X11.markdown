@@ -22,10 +22,10 @@ X Window系统是在Unix和类Unix系统上建立图形用户界面的标准工�
 
 ## 实体对象
 
--   Display
--   Window
+-   Display：X Window采用C/S模型，Display可以认为是Client与Server之间的连接的句柄。从Client的角度来讲，可以将Display看成一个Server
+-   Window：作为一个句柄，代表一个窗口实例。
 -   Visual
--   XEvent
+-   XEvent：表示一个窗口事件。
 
 ## 窗口相关操作
 
