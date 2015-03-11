@@ -1,6 +1,6 @@
 ---
 layout: post
-title: “关于X11”
+title: 关于X11
 date: 2015-03-11 22:43:00
 categories: game dev 
 description: 关于X11的一些笔记
