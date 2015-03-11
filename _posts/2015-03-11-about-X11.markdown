@@ -1,0 +1,24 @@
+---
+layout: post
+title: “关于X11”
+date: 2015-03-11 22:43:00
+categories: game dev 
+description: 关于X11的一些笔记
+---
+
+
+
+## 实体对象
+
+-   Display
+-   Window
+-   Visual
+
+
+## 窗口相关操作
+
+
+## 窗口事件
+
+
+## 杂项
