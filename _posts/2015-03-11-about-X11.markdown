@@ -31,8 +31,28 @@ X Window系统是在Unix和类Unix系统上建立图形用户界面的标准工�
 
 ## 窗口相关操作
 
+### 创建
+既然是C/S模型，那么在进行任何操作之前，都得先创建一个与服务器的连接。使用`XOpenDisplay`函数就可以完成该任务，该函数返回一个`Display`结构的指针。后面的对于X11的操作基本上都基于这个连接。
+接着，可以组织一些窗口的参数，包括父窗口句柄，窗口位置，大小等属性。以这些参数调用`XCreateWindow`或`XCreateSimpleWindow`就可以创建一个窗口，新创建的窗口默认是未映射的(Unmapped)。
 
-### 创建与关闭
+```
+// 建立连接
+Display *display = XOpenDisplay(NULL);
+
+// 准备参数
+Visual *visual = DefaultVisual(display, 0);
+Window parent = DefaultRootWindow(display);
+int x = 0, y = 0;
+int width = 320, height = 200;
+int border_width = 0;
+int depth = CopyFromParent;
+unsigned int class = CopyFromParent;
+unsigned long value_mask = 0;
+XSetWindowAttributes *pAttr = NULL;
+
+// 创建窗口
+Window window = XCreateWindow(display, parent, x, y, width, height, border_width, depth, class, visual, value_mask, pAttr);
+```
 
 ### 属性
 
