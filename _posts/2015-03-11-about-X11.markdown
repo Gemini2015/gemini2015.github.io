@@ -101,7 +101,19 @@ Window window = XCreateWindow(display, parent, x, y, width, height, border_width
     XGetWindowAttributes(display, window, &attr);
     ```
     代码意思很清楚，获取窗口的属性，而且`attr`中也有`x,y`字段。但是实际上这样做是得不到结果的。得到的`x,y`一直都是`0,0`。目前还没弄明白`attr`里面的`x,y`字段到底有什么用。
+
+-   窗口大小
     
+    ```
+    Display *display;
+    Window window;
+    XWindowAttributes attr;
+    XGetWindowAttributes(display, window, &attr);
+    int window_widht = attr.width;
+    int window_height = attr.height;
+    ```
+    虽然不能获取到位置，但是却可以获取到窗口的大小。需要注意的是，**上面获取到的宽高指的是窗口内部，不包括边框大小。**
+
 ## 窗口事件
 
 
