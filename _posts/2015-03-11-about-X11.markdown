@@ -55,7 +55,25 @@ Window window = XCreateWindow(display, parent, x, y, width, height, border_width
 ```
 
 ### 属性
+对于一个窗口来说，经常会使用到的属性无外乎窗口标题、大小、位置、颜色深度、可见性等。
 
+-   窗口标题
+    
+    ```
+    Display *display;
+    Window window;
+    // 设置标题
+    XStoreName(display, window, "Hello X11");
+
+    char buf[256];
+    // 获取标题
+    XFetchName(display, window, &buf);
+    ```
+    事实上`XStoreName`不一定会设置窗口标题。查看`XStoreName`的手册，有这样的解释:
+
+    > The `XStoreName` function assigns the name passed to window_name to the specified window.  A window manager can display the window name in some prominent place, such as the title bar, to allow users to identify windows easily.
+
+    也就是说，具体的行为是由窗口管理器(Window Manager)定义的。至少在我运行的平台上，该函数可以设置窗口标题。
 
 ## 窗口事件
 
