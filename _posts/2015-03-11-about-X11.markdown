@@ -75,6 +75,33 @@ Window window = XCreateWindow(display, parent, x, y, width, height, border_width
 
     也就是说，具体的行为是由窗口管理器(Window Manager)定义的。至少在我运行的平台上，该函数可以设置窗口标题。
 
+-   窗口位置
+    
+    ```
+    Display *display;
+    Window window;
+    Window root, parent, *child;
+    unsigned int nchild = 0;
+    // 查询window对应的 root window
+    // 一般root window 代表桌面
+    XQueryTree(display, window, &root, &parent, &child, &nchild);
+    if(child)
+        XFree(child);
+    int x, y;
+    Window cw;
+    // 将window的原点(0, 0)转换到root window坐标系中
+    XTranslateCoordinates(display, window, root, 0, 0, &x, &y, &cw);
+    ```
+    关于窗口位置的获取，有许多人会使用下面的方法：
+
+    ```
+    Display *display;
+    Window window;
+    XWindowAttributes attr;
+    XGetWindowAttributes(display, window, &attr);
+    ```
+    代码意思很清楚，获取窗口的属性，而且`attr`中也有`x,y`字段。但是实际上这样做是得不到结果的。得到的`x,y`一直都是`0,0`。目前还没弄明白`attr`里面的`x,y`字段到底有什么用。
+    
 ## 窗口事件
 
 
