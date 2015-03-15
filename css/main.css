@@ -395,6 +395,43 @@ a:visited { color: #205caa; }
   margin-bottom: 50px;
 }
 
+.decorate-tex
+{
+    width: 80%;
+    height: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.rotate_plane
+{
+    margin-top: 20px;
+    margin-right: 5%;
+    margin-left: auto;
+    width: 50%;
+    height: 50%;
+
+    transform:rotate(5deg);
+    -ms-transform:rotate(5deg);     /* IE 9 */
+    -moz-transform:rotate(5deg);    /* Firefox */
+    -webkit-transform:rotate(5deg); /* Safari 和 Chrome */
+    -o-transform:rotate(5deg);  /* Opera */
+
+    transition:transform 2s;
+    -moz-transition:-moz-transform 2s; /* Firefox 4 */
+    -webkit-transition:-webkit-transform 2s; /* Safari and Chrome */
+    -o-transition:-o-transform 2s; /* Opera */
+}
+
+.rotate_plane:hover
+{
+    transform:rotate(-360deg);
+    -ms-transform:rotate(-360deg);     /* IE 9 */
+    -moz-transform:rotate(-360deg);    /* Firefox */
+    -webkit-transform:rotate(-360deg); /* Safari 和 Chrome */
+    -o-transform:rotate(-360deg);  /* Opera */
+}
+
 .site-footer {
   margin-top: 0px;
   /*padding: 5px ;*/
