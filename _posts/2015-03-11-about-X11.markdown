@@ -21,6 +21,19 @@ X Window系统是在Unix和类Unix系统上建立图形用户界面的标准工�
 
 事实上，已经有很多成熟的对X11进行封装的库，但是我目前并没有使用，我想先从底层原生API开始学习，以后再考虑使用封装库。
 
+## 程序模型
+与Win32程序一样，基于X11的程序也是由一个循环构成，收到消息，处理消息。
+
+```
+while(connected to server)
+{
+    Receive next event
+    Handle the event
+}
+```
+
+>Graphical Programming in X basically follows the asynchronous model i.e. "I won't do anything until you ask me to".
+
 ## 实体对象
 
 -   Display：X Window采用C/S模型，Display可以认为是Client与Server之间的连接的句柄。从Client的角度来讲，可以将Display看成一个Server
