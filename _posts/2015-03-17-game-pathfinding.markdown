@@ -86,7 +86,7 @@ for(int i = 0; i < MAX_NUM; i++)
 {
 	for(int j = 0; j < MAX_NUM; j++)
 	{
-		if(地图i, j相邻)
+		if(地图i,j相邻 || 地图i,j可传送)
 		{
 			weight[i][j] = WeightInMap[i][j];
 		}
