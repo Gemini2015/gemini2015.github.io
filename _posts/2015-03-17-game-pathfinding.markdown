@@ -32,9 +32,11 @@ description: 关于游戏中寻路的一些简单思路
 // 最大地图数量
 int MAX_NUM;
 
-// 任意两张地图x, y对应的权值为 map[x][y]
+// 任意两张地图x, y对应的权值为 weight[x][y]
 // 初始化为无穷大
 int weight[MAX_NUM][MAX_NUM] = { $ };
+// 保存最短路径
+int path[MAX_NUM][MAX_NUM] = { 0 };
 
 // 填充初始数据
 for(int i = 0; i < MAX_NUM; i++)
@@ -44,6 +46,7 @@ for(int i = 0; i < MAX_NUM; i++)
 		if(地图i, j相邻)
 		{
 			weight[i][j] = 1;
+            path[i][j] = j;
 		}
 	}
 }
@@ -55,9 +58,12 @@ for(int k = 0; k < MAX_NUM; k++)
 	{
 		for(int j = 0; j < MAX_NUM; j++)
 		{
+            if(i == k || j == k || i == j)
+                continue;
 			if(weight[i][k] + weight[k][j] < weight[i][j])
 			{
 				weight[i][j] = weight[i][k] + weight[k][j];
+                path[i][j] = path[i][k];
 			}
 		}
 	}
@@ -77,9 +83,11 @@ int MAX_NUM;
 // 通过地图内寻路计算出来的权值
 int WeightInMap[MAX_NUM][MAX_NUM];
 
-// 任意两张地图x, y对应的权值为 map[x][y]
+// 任意两张地图x, y对应的权值为 weight[x][y]
 // 初始化为无穷大
 int weight[MAX_NUM][MAX_NUM] = { $ };
+// 保存最短路径
+int path[MAX_NUM][MAX_NUM] = { 0 };
 
 // 填充初始数据
 for(int i = 0; i < MAX_NUM; i++)
@@ -89,6 +97,7 @@ for(int i = 0; i < MAX_NUM; i++)
 		if(地图i,j相邻 || 地图i,j可传送)
 		{
 			weight[i][j] = WeightInMap[i][j];
+            path[i][j] = j;
 		}
 	}
 }
@@ -100,10 +109,13 @@ for(int k = 0; k < MAX_NUM; k++)
 	{
 		for(int j = 0; j < MAX_NUM; j++)
 		{
-			if(weight[i][k] + weight[k][j] < weight[i][j])
-			{
-				weight[i][j] = weight[i][k] + weight[k][j];
-			}
+			if(i == k || j == k || i == j)
+                continue;
+            if(weight[i][k] + weight[k][j] < weight[i][j])
+            {
+                weight[i][j] = weight[i][k] + weight[k][j];
+                path[i][j] = path[i][k];
+            }
 		}
 	}
 }
