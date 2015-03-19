@@ -1,8 +1,9 @@
 ---
 layout: post
-title:  "Github Pages静态页面搭建记录"
+title:  "Github Pages静态网站搭建记录"
 date:   2014-08-10 21:14:00
 categories: Github Pages
+description: 介绍Github上搭建静态网站的步骤
 ---
 
 
@@ -28,6 +29,7 @@ categories: Github Pages
 --
 
 如果你想用Github Pages来搭建个人博客，首先请确认一下几点
+
 - 最简单的英文应该能看懂吧
 - 拥有一个 Github 账号，以及会使用基本的git命令，并且本机已经配置好git。
 - 当然得会用 Markdown 写文章了
@@ -95,6 +97,13 @@ Jekyll 安装
 4.  至此，Jekyll 就安装好了。
 
 更多内容，可以到[Jekyll官网](http://jekyllrb.com/)查阅。
+
+
+## Windows平台
+在Windows平台上搭建，首先需要安装Ruby。[RubyGems](https://rubygems.org/ 'RubyGems')上最新版的`github-pages`对Ruby的版本要求是**1.9.3以上**。关于Windows平台上Ruby的安装，可以在[RubyInstaller](http://rubyinstaller.org/downloads/)这个网站上找到资源。
+安装好Ruby之后，就可以参阅上面的Jekyll安装步骤，安装Jekyll了。
+
+具体步骤，可以参考外国网友[juthilo的博客](http://jekyll-windows.juthilo.com/)。
 
 
 
