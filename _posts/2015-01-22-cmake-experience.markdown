@@ -119,3 +119,16 @@ while(it != DictMap.end())
 # Use C++11 in linux
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=gnu++0x")
 ```
+
+### MSVC 禁用特定警告
+**一般情况下，不要禁用任何警告，而应该积极解决每一个警告。**
+但是有些情况下，当你充分了解某些警告可能造成的后果时，也可以禁用该警告。
+比如要禁用警告4819(该文件包含不能在当前代码页中表示的字符)，可以采用下面的语句：
+
+```
+if(MSVC)
+
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4819")
+
+endif()
+```
