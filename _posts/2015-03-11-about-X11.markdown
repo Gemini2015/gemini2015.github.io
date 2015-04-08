@@ -9,6 +9,8 @@ description: 关于X11的一些笔记
 
 X Window系统是在Unix和类Unix系统上建立图形用户界面的标准工具包和协议，**11**代表版本11。X Window系统基于C/S(客户端/服务器)模型，与通常意义上的**服务器**不同的是，X Window的服务器一般是指使用者本地的计算机。**X Window只是一套协议**，现在在类Unix系统中较常用的实现是**X.Org的参考实现**。
 
+在Linux平台上，与X Window系统相关的结构和操作都定义在`Xlib`中，`Xlib`库的的主要作用是**窗口管理**和**事件处理**。
+
 1984年，Bob Scheifler 和 Jim Gettys 制订了X的早期原则：
 
 - 除非没有它就无法完成一个真正完整的应用程序，否则不用增加新的功能。
@@ -131,3 +133,5 @@ Window window = XCreateWindow(display, parent, x, y, width, height, border_width
 
 
 ## 杂项
+
+- [Linux上的OpenGL编程](https://www.opengl.org/wiki/OpenGL_in_Linux:_Programming "OpenGL in Linux: Programming")，简单介绍了X11与OpenGL的关联操作。
