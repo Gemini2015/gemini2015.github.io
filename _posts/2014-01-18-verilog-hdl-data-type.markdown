@@ -3,6 +3,7 @@ layout: post
 title:  "Verilog HDL语言要素 - 数据类型"
 date:   2014-01-18 22:48:05
 categories: Verilog
+codelang: verilog
 ---
 
 数据类型
@@ -38,15 +39,11 @@ assign out[5:2] = in
     Register变量需要被明确的赋值  
     在设计过程中，必须将寄存器变量放在过程语句中，通过过程赋值语句赋值（initial，always）  
     **关键字:**
-    <pre>
-        <code>
-reg
+    <pre><code>reg
 integer
 real
 time
-parameter  //定义符号常量
-        </code>
-    </pre>
+parameter  //定义符号常量</code></pre>
 
 寄存器&存储器
 --

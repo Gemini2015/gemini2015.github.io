@@ -4,6 +4,7 @@ title: "SAE Django Note"
 date: 2014-11-10 23:17:00
 categories: Notea
 description: "关于在sae上采用django框架开发网站的点滴记录……"
+codelang: django
 ---
 
 

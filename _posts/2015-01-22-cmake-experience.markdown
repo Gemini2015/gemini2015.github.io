@@ -4,6 +4,7 @@ title: CMake经验
 date: 2015-01-22 22:32:11
 categories: CMake
 description: 使用CMake的一些经验
+codelang: cmake
 ---
 
 

@@ -3,6 +3,7 @@ layout: post
 title:  "Verilog HDL语言要素 - 词法"
 date:   2014-01-05 20:17:54
 categories: Verilog
+codelang: verilog
 ---
 
 所谓的语言要素，实际上主要包括词法和数据类型。

@@ -17,6 +17,8 @@
 
         <script type="text/javascript" src="{{ "/js/stickUp.min.js" | prepend: site.baseurl }}"></script>
 
+        <script src="{{ "/js/highlight.pack.js" | prepend: site.baseurl }}"></script>
+
         <script type="text/javascript">
             jQuery(function($) {
                 $(document).ready( function() {
@@ -49,6 +51,20 @@
 
                         // add stickUp
                         $('.navbar-title').stickUp();
+
+                        // set code language, default cpp
+                        var codelang = $('#codelang').attr("value");
+                        if(codelang == "") codelang = "cpp";
+                        $('pre code').each(function(index, elem){
+                            $(elem).attr("class", codelang);
+                        });
+
+                        // init & apply highlight
+                        hljs.configure({
+                            tabReplace: '    ', // replace a tab with 4 spaces
+                        })
+                        hljs.initHighlighting();
+
                     }
                 });
               });
