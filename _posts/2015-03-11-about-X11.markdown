@@ -40,7 +40,7 @@ while(connected to server)
 
 -   Display：X Window采用C/S模型，Display可以认为是Client与Server之间的连接的句柄。从Client的角度来讲，可以将Display看成一个Server
 -   Window：作为一个句柄，代表一个窗口实例。
--   Visual
+-   Visual：表示特定的视觉信息的组合，如颜色深度，颜色缓冲等。应用程序必须选择当前驱动支持的视觉信息组合。
 -   XEvent：表示一个窗口事件。
 
 
@@ -128,6 +128,54 @@ Window window = XCreateWindow(display, parent, x, y, width, height, border_width
     int window_height = attr.height;
     ```
     虽然不能获取到位置，但是却可以获取到窗口的大小。需要注意的是，**上面获取到的宽高指的是窗口内部，不包括边框大小。**
+
+### 关闭
+对于X Window来说，有两种方式可以关闭窗口。
+
+-   用户通过代码关闭窗口
+    
+    ```
+    Display *display;
+    Window window;  // 待关闭的窗口
+    XDestroyWindow(display, window);
+    ```
+    上面的代码可以关闭一个窗口，但是并没有断开与X Server的连接（Display），所以程序还可以继续发出请求。
+    如果不需要再进行任何请求了，那么可以通过`XCloseDisplay(display)`来关闭连接。
+
+-   由窗口管理器（Window Manager，简称WM）来关闭窗口
+    当用户点击窗口上的*关闭*按钮时，默认情况下会由WM来关闭窗口。需要注意的是，**用户所看到的关闭按钮、最大最小化按钮、以及标题栏等都是由WM附加到窗口上的**。也就是说，这些不是由X Server创建的，因此对这些按钮的操作响应默认都是由WM来处理的。
+    对于关闭按钮，大多数的WM会执行如下操作：**关闭窗口（XDestroyWindow），断开与X Server的连接（XCloseDisplay）**。
+
+    对于有些程序，当程序结束运行时，会有关闭窗口、断开连接的操作，如果是先由WM关闭了窗口（比如点击关闭按钮），那么再执行用户编写的关闭窗口操作时，可能会发生错误（因为该窗口已经由WM关闭了）。
+
+    很明显，这种关闭窗口的方式不能满足用户的需求，因此，有一种办法可以“介入”WM关闭窗口的流程。
+    在创建窗口的时候，需要为窗口设置协议，告诉WM，当用户点击*关闭*按钮时，应该向用户程序发送事件，而不是直接关闭窗口。
+
+    ```
+    /*  创建窗口  */
+    Display *display;
+    Window window;
+    Atom atom = XInternAtom(display, "WM_DELETE_WINDOW", false);
+    XSetWMProtocols(display, window, &atom, 1);
+    ```
+    通过上面的设置，在Window接收`ClientMessage`消息时，可以通过下面的代码来处理点击*关闭*按钮事件。
+
+    ```
+    while(true)
+    {
+        XEvent event;
+
+        XNextEvent(display, &event);
+        if(event.type == ClientMessage)
+        {
+            if(event.xclient.data.l[0] == atom)
+            {
+                // 执行用户定义的关闭窗口操作
+            }
+        }
+    }
+    ```
+
 
 ## 窗口事件
 
