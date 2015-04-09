@@ -178,7 +178,84 @@ Window window = XCreateWindow(display, parent, x, y, width, height, border_width
 
 
 ## 窗口事件
+关于窗口事件的处理，涉及到两个基本步骤：第一步是获取窗口事件，第二步是对事件进行响应。
 
+### 事件
+不同的事件有不同的**事件类型**(EventType)，如：`FocusIn`，`FocusOut`，`KeyPress`等。同一类的事件可以用一个组表示，这个组称为事件掩码(EventMask)（本人理解）。如：`KeyPressMask`对应着`KeyPress`。
+
+在创建窗口时，可以选择对哪些事件感兴趣，那么应用程序将只会接收到感兴趣的事件。
+
+
+### 获取事件
+同Windows一样，在X Window系统中，针对与不同的目的，获取事件的方式可以分为**阻塞**和**非阻塞**两种。
+
+-   阻塞模式
+
+    ```
+    Display *display;
+    while(true)
+    {
+        XEvent event;
+        // 阻塞，直到有事件发生
+        XNextEvent(display, &event);
+
+        /* 响应event */
+        EventProcess(event);
+    }
+    ```
+    与`XNextEvent`相似，同样采用阻塞方式获取事件的函数还有`XPeekEvent`，`XWindowEvent`，`XMaskEvent`，但是这些函数也都有各自的区别。
+    `XNextEvent`会将获取到event从事件队列中删除掉。
+    `XPeekEvent`不会从事件队列中删除获取到的事件。
+    `XWindowEvent`检查特定Window的特定掩码事件，会将获取到event从事件队列中删除掉。
+    `XMaskEvent`检查特定掩码的事件，会将获取到event从事件队列中删除掉。
+
+-   非阻塞方式
+
+    ```
+    Display *display;
+    Window window;
+    long event_mask = StructureNotifyMask | ExposureMask;
+    while(true)
+    {
+        XEvent event;
+        // 非阻塞
+        while(XCheckWindowEvent(display, window, event_mask, &event))
+        {
+            /* 响应event */
+            EventProcess(event);
+        }
+    }
+    ```
+    同样采用非阻塞方式获取事件的还有`XCheckMaskEvent`，`XCheckTypedEvent`，`XCheckTypedWindowEvent`，这些消息都会将获取到的事件从事件队列中删除。
+    `XCheckWindowEvent`检查特定窗口的特定掩码事件。
+    `XCheckMaskEvent`检查特定掩码的事件。
+    `XCheckTypedEvent`检查特定类型的事件。
+    `XCheckTypedWindowEvent`检查特定窗口的特定类型的事件。
+
+当使用`XCheckWindowEvent`来进行非阻塞获取事件时，有一点需要注意的是**XCheckWindowEvent无法获取没有Mask的消息，比如 ClientMessage**。所以对于像`ClientMessage`这样的消息，可能要使用`XCheckTypedWindowEvent`来获取。
+
+### 响应事件
+可以根据`event.type`来对事件进行区分，并加以响应。代码结构如下。
+
+```
+void EventProcess(XEvent& event)
+{
+    switch(event.type)
+    {
+        case KeyPress:
+        {
+            /* 处理程序 */
+        }
+        break;
+        case KeyRelease:
+        {
+            /* 处理程序 */
+        }
+        break;
+        default:break;
+    }
+}
+```
 
 ## 杂项
 
