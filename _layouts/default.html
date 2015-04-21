@@ -65,6 +65,10 @@
                         })
                         hljs.initHighlighting();
 
+                        $('article img').each(function(index, elem){
+                            $(elem).attr("class", "img-thumbnail center-block img-responsive");
+                        });
+
                     }
                 });
               });
