@@ -94,13 +94,6 @@ configure_file(
 
 ## 编译选项
 
-### 设置安装路径前缀
-使用`install`命令安装项目的时候，如果路径给出的是**全路径**，那么会直接使用这个路径，如果给出的是相对路径，那么会加上`CMAKE_INSTALL_PREFIX`，默认情况下这个值为`C:/Program Files (x86)`。可以直接在CMakeLists里面设置这个值，也可以在CMake GUI里面设置。
-
-```
-set(CMAKE_INSTALL_PREFIX "D:/Program Files (x86)/" CACHE PATH "Project install directory" FORCE)
-```
-
 ### Linux使用 C++ 11
 在Linux下编译下面的代码时出错。
 
@@ -132,4 +125,45 @@ if(MSVC)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4819")
 
 endif()
+```
+
+## 安装
+
+### 设置安装路径前缀
+使用`install`命令安装项目的时候，如果路径给出的是**全路径**，那么会直接使用这个路径，如果给出的是相对路径，那么会加上`CMAKE_INSTALL_PREFIX`，默认情况下这个值为`C:/Program Files (x86)`。可以直接在CMakeLists里面设置这个值，也可以在CMake GUI里面设置。
+
+```
+set(CMAKE_INSTALL_PREFIX "D:/Program Files (x86)/" CACHE PATH "Project install directory" FORCE)
+```
+
+### 根据配置设置安装目录
+CMake预定义了四种编译配置: Debug、Release、RelWithDebInfo、MinSizeRel。大多数时候，我们只会安装Release版本。但是在某些情况下，比如A项目链接B项目的静态库，当A项目采用Debug编译时，需要链接B项目的Debug版本，当A项目采用Release编译时，需要链接B项目的Release版本。
+
+假设我们使用了`link_directories(${PROJECT_BINARY_DIR}/lib)`命令设置了静态库查找目录，那么在Visual Studio中，实际查找目录是`/projectpath/lib`和`/projectpath/lib/$(Configuration)`，`$(Configuration)`表示编译配置。
+
+因此，我们在设置安装目录时，也可以采用`lib/Debug`和`lib/Release`这种结构。使用下面的代码可以完成这个功能。
+
+```
+foreach(lib_file platform)
+	install(TARGETS ${lib_file}
+		RUNTIME DESTINATION "lib/Debug" CONFIGURATIONS Debug
+		LIBRARY DESTINATION "lib/Debug"  CONFIGURATIONS Debug
+		ARCHIVE DESTINATION "lib/Debug" CONFIGURATIONS Debug
+		)
+	install(TARGETS ${lib_file}
+		RUNTIME DESTINATION "lib/Release" CONFIGURATIONS Release
+		LIBRARY DESTINATION "lib/Release"  CONFIGURATIONS Release
+		ARCHIVE DESTINATION "lib/Release" CONFIGURATIONS Release
+		)
+	install(TARGETS ${lib_file}
+		RUNTIME DESTINATION "lib/RelWithDebInfo" CONFIGURATIONS RelWithDebInfo
+		LIBRARY DESTINATION "lib/RelWithDebInfo"  CONFIGURATIONS RelWithDebInfo
+		ARCHIVE DESTINATION "lib/RelWithDebInfo" CONFIGURATIONS RelWithDebInfo
+		)
+	install(TARGETS ${lib_file}
+		RUNTIME DESTINATION "lib/MinSizeRel" CONFIGURATIONS MinSizeRel
+		LIBRARY DESTINATION "lib/MinSizeRel"  CONFIGURATIONS MinSizeRel
+		ARCHIVE DESTINATION "lib/MinSizeRel" CONFIGURATIONS MinSizeRel
+		)
+endforeach()
 ```
