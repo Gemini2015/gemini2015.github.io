@@ -146,22 +146,22 @@ CMake预定义了四种编译配置: Debug、Release、RelWithDebInfo、MinSizeR
 ```
 foreach(lib_file platform)
 	install(TARGETS ${lib_file}
-		RUNTIME DESTINATION "lib/Debug" CONFIGURATIONS Debug
+		RUNTIME DESTINATION "bin/Debug" CONFIGURATIONS Debug
 		LIBRARY DESTINATION "lib/Debug"  CONFIGURATIONS Debug
 		ARCHIVE DESTINATION "lib/Debug" CONFIGURATIONS Debug
 		)
 	install(TARGETS ${lib_file}
-		RUNTIME DESTINATION "lib/Release" CONFIGURATIONS Release
+		RUNTIME DESTINATION "bin/Release" CONFIGURATIONS Release
 		LIBRARY DESTINATION "lib/Release"  CONFIGURATIONS Release
 		ARCHIVE DESTINATION "lib/Release" CONFIGURATIONS Release
 		)
 	install(TARGETS ${lib_file}
-		RUNTIME DESTINATION "lib/RelWithDebInfo" CONFIGURATIONS RelWithDebInfo
+		RUNTIME DESTINATION "bin/RelWithDebInfo" CONFIGURATIONS RelWithDebInfo
 		LIBRARY DESTINATION "lib/RelWithDebInfo"  CONFIGURATIONS RelWithDebInfo
 		ARCHIVE DESTINATION "lib/RelWithDebInfo" CONFIGURATIONS RelWithDebInfo
 		)
 	install(TARGETS ${lib_file}
-		RUNTIME DESTINATION "lib/MinSizeRel" CONFIGURATIONS MinSizeRel
+		RUNTIME DESTINATION "bin/MinSizeRel" CONFIGURATIONS MinSizeRel
 		LIBRARY DESTINATION "lib/MinSizeRel"  CONFIGURATIONS MinSizeRel
 		ARCHIVE DESTINATION "lib/MinSizeRel" CONFIGURATIONS MinSizeRel
 		)
