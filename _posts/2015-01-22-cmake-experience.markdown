@@ -127,6 +127,49 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4819")
 endif()
 ```
 
+## 调试运行
+
+### Visual Studio设置工作目录
+使用Visual Studio开发的时候，假设编译构建生成的程序在`binarypath/bin/debug`目录下。我们调试时，会有一些数据要使用，假设这些数据在`binarypath/data`目录下，如果程序查找数据文件时，只在当前目录下查找，那么在这种情况下，就无法找到数据。要解决这个问题，可以在Visual Studio中设置工作目录，这样程序就能找到数据文件。
+Visual Studio的工作目录设置是保存在`projectname.vcxproj.user`文件中，CMake没有提供专门的命令来设置工作目录，但是我们可以通过类似配置文件的方式来手动生成`projectname.vcxproj.user`文件。
+**perconfig.vcxproj.user.in**
+
+```
+<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='@USERFILE_CONFIGNAME@|@USERFILE_PLATFORM@'">
+	<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+	<LocalDebuggerCommandArguments>@USERFILE_COMMAND_ARGUMENTS@</LocalDebuggerCommandArguments>
+	<LocalDebuggerWorkingDirectory>@USERFILE_WORKING_DIRECTORY@</LocalDebuggerWorkingDirectory>
+</PropertyGroup>
+```
+**vcxproj.user.in**
+
+```
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="@USERFILE_VC_VERSION@" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+@USERFILE_CONFIGSECTIONS@
+</Project>
+```
+CMake 模块
+
+```
+file(READ "${_launchermoddir}/perconfig.vcxproj.user.in" _perconfig)
+set(USERFILE_CONFIGSECTIONS)
+# 对于每一个配置（Debug, Release, RelWithDebInfo, MinSizeRel），生成对应的配置项
+foreach(USERFILE_CONFIGNAME ${CMAKE_CONFIGURATION_TYPES})
+	string(CONFIGURE "${_perconfig}" _temp @ONLY ESCAPE_QUOTES)
+	string(CONFIGURE
+		"${USERFILE_CONFIGSECTIONS}${_temp}"
+		USERFILE_CONFIGSECTIONS
+		ESCAPE_QUOTES)
+endforeach()
+
+configure_file("${_launchermoddir}/vcxproj.user.in"
+	${VCPROJNAME}.vcxproj.user
+	@ONLY)
+```
+**perconfig.vcxproj.user.in**中出现的`@USERFILE_CONFIGNAME@`、`@USERFILE_PLATFORM@`、`@USERFILE_PLATFORM@`、`@USERFILE_COMMAND_ARGUMENTS@`、`@USERFILE_WORKING_DIRECTORY@`等，都是在CMake模块中预先设置好的变量，通过`string(CONFIGURE "${_perconfig}" _temp @ONLY ESCAPE_QUOTES)`语句填到配置里面去的。
+
+
 ## 安装
 
 ### 设置安装路径前缀
