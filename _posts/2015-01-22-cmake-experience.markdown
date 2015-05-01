@@ -169,6 +169,36 @@ configure_file("${_launchermoddir}/vcxproj.user.in"
 ```
 **perconfig.vcxproj.user.in**中出现的`@USERFILE_CONFIGNAME@`、`@USERFILE_PLATFORM@`、`@USERFILE_PLATFORM@`、`@USERFILE_COMMAND_ARGUMENTS@`、`@USERFILE_WORKING_DIRECTORY@`等，都是在CMake模块中预先设置好的变量，通过`string(CONFIGURE "${_perconfig}" _temp @ONLY ESCAPE_QUOTES)`语句填到配置里面去的。
 
+### 拷贝运行时库
+对于需要动态链接的库，一般是直接在可执行程序目录下查找的，所以对于项目中使用的第三方动态链接库，我们需要在用CMake构建项目的时候，将这些动态链接库拷贝到最终可执行文件目录下。
+
+**拷贝动态链接库**，用于调试时运行。
+
+```
+macro(copy_dll depdir dllname)
+	foreach(configuration ${CMAKE_CONFIGURATION_TYPES})
+		# 对应于不同的构建版本
+		set(dllpath "${depdir}/bin/${configuration}/${dllname}")
+		if(EXISTS ${dllpath})
+			configure_file(${dllpath} ${CMAKE_BINARY_DIR}/bin/${configuration}/${dllname} COPYONLY)
+		endif()
+	endforeach()
+endmacro()
+```
+
+**安装动态链接库**，用于最终应用程序安装部署。
+
+```
+macro(install_dll depdir dllname)
+	foreach(configuration ${CMAKE_CONFIGURATION_TYPES})
+		set(dllpath "${depdir}/bin/${configuration}/${dllname}")
+		if(EXISTS ${dllpath})
+			install(FILES ${dllpath} DESTINATION bin/${configuration} CONFIGURATIONS ${configuration})
+		endif()
+	endforeach()
+endmacro()
+```
+
 
 ## 安装
 
