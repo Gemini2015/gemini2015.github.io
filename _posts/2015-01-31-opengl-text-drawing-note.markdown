@@ -1,9 +1,9 @@
 ---
 layout: post
-title: OpenGL文字绘制笔记
+title: FreeType文字绘制笔记
 date: 2015-01-31 22:28:41
 categories: game dev 
-description: 记录实现OpenGL文字绘制的过程
+description: 记录利用FreeType进行文字绘制的过程
 ---
 
 
