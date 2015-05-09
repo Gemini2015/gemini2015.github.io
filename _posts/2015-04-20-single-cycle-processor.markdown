@@ -20,6 +20,11 @@ codelang: verilog
 ### 我们需要哪些知识？
 关于理论知识的话，主要是数字电子技术（简称数电），其实单纯是设计的话，数电方面的知识就差不多够了，如果要实现的话，还得使用专门的技术，比如HDL（硬件描述语言）来具体描绘出CPU的逻辑结构。
 
+-   [iVerilog 安装](http://blog.icodeten.com/verilog/2014/01/04/iverilog-install/)
+-   [Verilog HDL语言要素 - 数据类型](http://blog.icodeten.com/verilog/2014/01/18/verilog-hdl-data-type/)
+-   [Verilog HDL语言要素 - 词法](http://blog.icodeten.com/verilog/2014/01/05/verilog-hdl-word/)
+-   [iVerilog & gtkwave 使用说明](http://blog.icodeten.com/verilog/2014/02/19/iverilog-gtkwave/)
+
 ### RISC & CISC ？
 CPU按其指令系统，可以分为两类：**RISC** CPU和**RISC** CPU。
 RISC（Reduced Instruction Set Computer，精简指令集计算机），其特点是指令较少，指令字定长，格式规整，寻址方式单一，指令功能原子化。

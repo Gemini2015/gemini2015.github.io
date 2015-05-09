@@ -14,19 +14,19 @@ categories: Verilog
 关于iverilog的安装，官网给出了教程[传送门](http://iverilog.wikia.com/wiki/Installation_Guide)
 另外，网上的教程比较多。
 
-## 三个平台：
+## 三个平台
 
-### PC:
+### Win
 没装过，所以不知道好不好装
 
-### Linux/Ubuntu：
+### Linux/Ubuntu
 官网给出的教程有点复杂，我试了一下直接用下面的命令就可以安装。
 `sudo apt-get install iverilog`
 `sudo apt-get install gtkwave`
 可以给Ubuntu添加一些国内的源，我这个是在163的源上下载的。
 PS.我的Ubuntu是12.04。
 
-### Mac OS X:
+### Mac OS X
 因为我用的MacBook，所以我在Mac下面也装了一个。
 系统是10.9 Mavericks，装下来花了好长时间。
 
