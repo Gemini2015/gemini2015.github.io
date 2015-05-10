@@ -37,6 +37,8 @@ CISC（Complex Instruction Set Computer，复杂指令集计算机），其特�
 1.	采用哈佛结构，使用分开的指令和数据接口。
 1.	数据宽度为32位，采用大端序。
 
+详细指令列表，可以参考[InstructionList.xlsx](/etc/InstructionList.xlsx 'InstructionList.xlsx')文件。
+
 ## 分析
 
 ### CPU黑盒模型
