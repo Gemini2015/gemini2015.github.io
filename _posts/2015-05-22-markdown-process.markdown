@@ -1,11 +1,13 @@
 ---
-layout:	post
-title:	Markdown后期处理
-date:	2015-05-22 21:34:56 
-categories:	web
+layout: post
 description: 对由Markdown渲染出的HTML进行后期处理的一些实践
+title: Markdown后期处理
+date: 2015-05-22 21:34:56
+categories: web
 codelang: js
 ---
+
+
 
 Markdown是一个轻量级的标记语言，同强大的HTML相比，它书写简单，冗余符号较少，易于学习。在保证最简单的语法的同时，对主流常用的文本格式均提供了支持。
 我是从搭建这个博客时开始接触Markdown，至今已有一年有余。已经使用Markdown写了十几篇博文，爱不释手。
@@ -58,4 +60,52 @@ $('#navbar-list').children('button').each(function(index, elem){
 // navbar-list 为一个div，我使用了一个第三方的库stickUp
 // 使其随滚动条移动
 $('.navbar-title').stickUp();
+```
+
+## 渲染
+
+### 代码着色
+可以在两个阶段对代码进行着色：渲染时，渲染后。
+
+1.	渲染时着色
+	在使用Jekyll进行渲染时，可以使用Jekyll提供的标签` {% highlight ruby %} ` 和 ` {% endhighlight %} ` 代替 ` ``` `包裹代码块，为代码块设置语言，同时实现着色。
+	***这种方法使用了非标准的Markdown标记，所以我没有采用这种办法。***
+
+2.	渲染后着色
+	由` ``` `标注的代码块会生成` <pre> `和` <code> `标签，因此可以使用js脚本，在浏览器本地进行着色。
+	我选择使用`highlight.js`库。`highlight.js`可以尝试识别代码所属的语言。但是识别效果不咋地。所以，我们还需要标注代码块所用的语言。
+	对于大部分文章，可以假设整篇文章中的代码都是采用同一种语言，因此，可以在文章的`Front Matter`中用一个变量保存当前文章的全局语言设置，然后在模板中引用该变量，保存到一个隐藏`<input>`标签中，最后通过js处理，将该隐藏`<input>`的值设置到每一个`<pre><code>`块中。
+
+渲染后着色相关实现：
+
+```
+// front matter
+---
+layout: post
+title:  "Verilog HDL语言要素 - 词法"
+date:   2014-01-05 20:17:54
+categories: Verilog
+codelang: verilog
+---
+```
+
+```
+// post 模板
+<input type="hidden" id="codelang" value="{{ page.codelang }}" />
+```
+
+```
+// js 脚本
+// set code language, default cpp
+var codelang = $('#codelang').attr("value");
+if(codelang == "") codelang = "cpp";
+$('pre code').each(function(index, elem){
+    $(elem).attr("class", codelang);
+});
+
+// init & apply highlight
+hljs.configure({
+    tabReplace: '    ', // replace a tab with 4 spaces
+})
+hljs.initHighlighting();
 ```
