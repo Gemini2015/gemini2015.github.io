@@ -272,3 +272,14 @@ foreach(lib_file platform)
 		)
 endforeach()
 ```
+
+## 工具
+
+作为一个项目构建工具，CMake用一种优雅的方式，描述了项目构建的步骤。
+但是对于大型项目而言，光是使用CMake简化项目构建过程还是不够的，还需要配备一套程序配合CMake来完成项目构建的过程。
+
+### 编译加速
+CMake只完成了从源文件到建立项目工程的过程，而真正编译，则还是要依赖于特定的编译工具，比如Visual Studio、gcc等。
+对于大型工程而言，工程的编译时间也是一件值得优化的事。目前，有一些工具可以加速基于CMake构建的工程的编译过程。
+
+*	[Electric Cloud Free CMake Accelerator](http://electric-cloud.com/plugins/build-automation/cmake-acceleration/)：似乎和 [Incredibuild](https://www.incredibuild.com/) 类似，利用本地集群分布式编译。
