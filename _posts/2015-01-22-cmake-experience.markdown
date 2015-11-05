@@ -92,6 +92,38 @@ configure_file(
 ```
 如果 CMakeLists.txt 中定义了`PLATFORM_WIN32`变量，那么`#cmakedefine PLATFORM_WIN32`就会变成C++的宏定义语句`#define PLATFORM_WIN32`。
 
+### 生成Visual Studio筛选器
+可以通过一个宏来为收集的文件建立筛选器。代码如下：
+
+```
+# file(GLOB_RECURSE all_files *.*)
+# create_filters(all_files)
+# add_executable(app ${all_files})
+
+macro(create_filters source_files)
+	if(MSVC)
+		# 获取当前目录
+		set(current_dir ${CMAKE_CURRENT_SOURCE_DIR})
+		foreach(src_file ${${source_files}})
+			# 求出相对路径
+			string(REPLACE ${current_dir}/ "" rel_path_name ${src_file})
+			# 删除相对路径中的文件名部分
+			string(REGEX REPLACE "(.*)/.*" \\1 rel_path ${rel_path_name})
+			# 比较是否是当前路径下的文件
+			string(COMPARE EQUAL ${rel_path_name} ${rel_path} is_same_path)
+			# 替换成Windows平台的路径分隔符
+			string(REPLACE "/" "\\" rel_path ${rel_path})
+			if(is_same_path)
+				set(rel_path "\\")
+			endif(is_same_path)
+
+			# CMake 命令
+			source_group(${rel_path} FILES ${src_file})
+		endforeach(src_file)
+	endif(MSVC)
+endmacro(create_filters)
+```
+
 ## 编译选项
 
 ### Linux使用 C++ 11
