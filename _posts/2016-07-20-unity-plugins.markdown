@@ -29,6 +29,7 @@ extern "C" {
 }
 ```
 那么在Unity中可按照以下步骤来调用这两个函数：
+
 1.	将`libfunc.a`放到`Assets/Plugins/iOS/`目录下
 2.	创建一个桥接C#脚本，内容如下
 
