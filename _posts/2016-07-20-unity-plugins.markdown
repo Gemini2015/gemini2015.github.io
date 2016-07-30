@@ -61,6 +61,80 @@ public class LibFuncWrap
 ```
 
 ### Android
+Android插件一般以`.jar`的形式提供。假设名为`MyClass.java`的文件，所在包为`com.icodeten.dev`，导出为`libFunc.jar`。
+其中`MyClass`的实现如下：
+
+```
+public class MyClass
+{
+	public void Func1(int intValue, String strValue)
+	{
+	}
+	
+	public String Func2()
+	{
+		return "Func2";
+	}
+	
+	public static void Func3()
+	{
+	}
+}
+```
+可按照下面的步骤，在Unity中调用上述方法：
+
+1.	将`libFunc.jar`放到`Assets/Plugins/Android`目录下
+2. 创建一个桥接C#脚本，内容如下：
+
+```
+public class AndroidWrap
+{
+	#if UNITY_ANDROID
+
+	struct ClassDefine
+	{
+		public const string ClassName = "com.icodeten.dev.MyClass";
+		public const string Func1 = "Func1";
+		public const string Func2 = "Func2";
+		public const string Func3 = "Func3";
+	}
+
+	private static AndroidJavaObject javaObj = null;
+
+	private static AndroidJavaObject GetInstance()
+	{
+		if(javaObj == null)
+		{
+			// java class 对象
+			// var javaClass = new AndroidJavaClass(ClassDefine.ClassName);
+			javaObj = new AndroidJavaObject(ClassDefine.ClassName);
+		}
+		return javaObj;
+	}
+
+	public static void Func1(int intValue, string strValue)
+	{
+		var obj = GetInstance();
+		obj.Call(ClassDefine.Func1, intValue, strValue);
+	}
+
+	public static string Func2()
+	{
+		var obj = GetInstance();
+		return obj.Call<string>(ClassDefine.Func2);
+	}
+
+	public static void Func3()
+	{
+		// 调用静态方法
+		var obj = GetInstance();
+		obj.CallStatic(ClassDefine.Func3);
+	}
+
+	#endif
+}
+
+```
 
 
 ## 开发
