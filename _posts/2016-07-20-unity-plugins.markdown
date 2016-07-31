@@ -138,9 +138,70 @@ public class AndroidWrap
 
 
 ## 开发
+很多情况下，我们不得不自己开发插件。比如一些原生的系统调用，Unity没有提供对应的接口，那么我们就必须编写插件来实现调用。
+经常有一些第三方服务只提供了`iOS`或`Android`的SDK，并没有直接提供Unity SDK，这个时候，就需要我们对这些SDK进行一些简单的封装，使得我们可以在Unity中调用这些SDK提供的接口。
+以下以访问系统剪切板为例，来简要介绍一下`iOS`和`Android`插件的开发过程。
 
 ### iOS
 
+1.	创建一个Xcode Project，项目模版选为“Cocoa Touch Static Library”。取名为`libClipboard`。
+2. 删除自动创建的`.h`文件（留着也可以）。将`.m`文件的后缀名改为`.mm`。
+3. `.mm`文件内容如下
+4.  执行Build。
+5. 将`.h`文件（如果没有删掉）和`.a`文件拷贝到Unity工程下`Assets/Plugins/iOS`使用。
+
+```
+#import <UIKit/UIKit.h>
+
+extern "C"
+{
+    void _SetTextToClipBoard(const char* plainText);
+    const char* _GetTextFromClipBoard();
+}
+
+// 传进来的字符串，如果需要在闭包里面使用的话，需要进行一次深拷贝
+void _SetTextToClipBoard(const char* plainText)
+{
+    [UIPasteboard generalPasteboard].string = [[NSString alloc]initWithUTF8String:plainText];
+}
+
+// 传给Unity的字符串，也要进行深拷贝，其内存交由Mono进行管理
+const char* _GetTextFromClipBoard()
+{
+    NSString *plainText = [UIPasteboard generalPasteboard].string;
+    if(plainText == nil)
+        return NULL;
+
+    const char* plainTextStr = [plainText UTF8String];
+    char *ret = strdup(plainTextStr);
+    return ret;
+}
+```
+
+
+
+#### Tips
+
+1.	使用`const char*`来对应`C#`里面的`string`类型，需要小心`const char*`的内存管理。否则容易出现访问野指针的情况。
+2. 当Xcode提示`extern`出错时，别忘了将`.m`文件改为`.mm`。
+3. Unity工程，导出Xcode工程，编译链接时，提示找不到`.a`中导出的函数，可以用`file libClipboard.a`命令看看`libClipboard.a`支持的架构。**如果要在真机上运行，那么静态库必须支持`armv7`和`arm64`架构。**插入真机设备，然后将调试设备设为真机，然后再执行Build，应该可以保证生成的`.a`文件支持`armv7`和`arm64`架构。
+4. 使用`NSString *result ＝ [NSString stringWithFormat:@"%@", nsStr]`时，如果`nsStr`为`NULL`时，那么`result`会是`(null)`，而不是空字符串。
+5. Unity提供了在`iOS`插件中向Unity发送消息的机制，以实现异步事件。
+
+```
+// 由Unity提供的函数
+// 第一个参数为场景上某个GameObject的名称
+// 第二个参数为该GameObject上挂载的某个脚本里面的方法名称
+// 第三个为自定义的字符串参数
+extern void UnitySendMessage(const char*, const char*, const char*);
+
+// 假设为某个异步回调
+void MyCallBack(int intValue, const char* strValue, NSString* nsStrValue)
+{
+	NSString *paramString = [NSString stringWithFormat:@"%d|%s|%@", intValue, strValue, nsStrValue);
+	UnitySendMessage("GameObjectName", "MethodName", paramString);
+}
+```
 
 ### Android
 
