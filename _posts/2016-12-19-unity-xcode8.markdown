@@ -7,28 +7,29 @@ codelang: csharp
 ---
 
 ## 前言
-本文基于现有Unity3D项目已经使用`XUPorter`和`Bash`脚本在Xcode 7环境下可以正常编译打包。
-Unity3D版本`5.3.5p8`
-Xcode版本`8.2`
+
+*   本文基于现有Unity3D项目已经使用`XUPorter`和`Bash`脚本在Xcode 7环境下可以正常编译打包。  
+*   Unity3D版本`5.3.5p8`  
+*   Xcode版本`8.2`  
 
 
 ## Xcode 8 主要变化
 
-＊   `Target`增加`Automatically manage signing`选项，勾选可以通过联网自动设置`Provision`、`TeamID`等。若不勾选，则需手动分别设置`Debug`和`Release`的`Provision`。
-＊   在Xcode 7环境下，使用`xcodebuild`编译时，只需要指定`CODE_SIGN_IDENTITY`参数。在Xcode 8环境中，还需要指定`PROVISIONING_PROFILE_SPECIFIER`和`DEVELOPMENT_TEAM`。
-＊   对证书的权限控制有所修改(猜的)。
+*    `Target`增加`Automatically manage signing`选项，勾选可以通过联网自动设置`Provision`、`TeamID`等。若不勾选，则需手动分别设置`Debug`和`Release`的`Provision`。
+*   在Xcode 7环境下，使用`xcodebuild`编译时，只需要指定`CODE_SIGN_IDENTITY`参数。在Xcode 8环境中，还需要指定`PROVISIONING_PROFILE_SPECIFIER`和`DEVELOPMENT_TEAM`。
+*   对证书的权限控制有所修改(猜的)。
 
 
 ## 主要任务
 
-＊   Unity3D 生成的Xcode工程，`Target`没有`Automatically manage signing`选项，如果没有该选项，在使用`xcodebuild`进行编译时会提示如下信息
-    ```
-    DemoProject requires a provisioning profile. Select a provisioning profile for the "Debug" build configuration in the project editor.
-    Code signing is required for product type 'Application' in SDK 'iOS 10.2'
-    ```
+*   在执行`xcodebuild`命令时，增加`PROVISIONING_PROFILE_SPECIFIER`和`DEVELOPMENT_TEAM`参数。  
+*   Unity3D 生成的Xcode工程，`Target`没有`Automatically manage signing`选项，如果没有该选项，在使用`xcodebuild`进行编译时会提示如下信息。
     因此，需要在Unity3D生成的Xcode工程里为`Target`添加`Automatically manage signing`选项。
 
-＊   在执行`xcodebuild`命令时，增加`PROVISIONING_PROFILE_SPECIFIER`和`DEVELOPMENT_TEAM`参数。
+    ```
+    DemoProject requires a provisioning profile. Select a provisioning profile for the "Debug" build configuration in the project editor.
+    Code signing is required for product type 'Application' in SDK 'iOS 10.2'  
+    ```
 
 
 ## 实现
@@ -196,11 +197,11 @@ Index: XCodePostProcess.cs
 
 为`xcodebuild`增加如下参数:
 
-*   `PROVISIONING_PROFILE_SPECIFIER`设置为`Provision`的名称，区分`Debug`与`Release`。
-*   `DEVELOPMENT_TEAM`设置为证书所属的`TeamID`。
+*   `PROVISIONING_PROFILE_SPECIFIER`设置为`Provision`的名称，区分`Debug`与`Release`。  
+*   `DEVELOPMENT_TEAM`设置为证书所属的`TeamID`。  
 
 
 ## Tips
 
-*   之前因为权限问题，将钥匙串中的开发证书都设置成了***始终信任***，但是在Xcode 8中，会导致签名失败（即使你已经正确设置了`Provision`），设置成***系统默认***可以解决这个问题。
-*   Xcode 7的`svn`版本为`1.7.22`，Xcode 8的`svn`版本为`1.9.4`，新版svn会升级文件格式，故敬慎升级。
+*   之前因为权限问题，将钥匙串中的开发证书都设置成了***始终信任***，但是在Xcode 8中，会导致签名失败（即使你已经正确设置了`Provision`），设置成***系统默认***可以解决这个问题。  
+*   Xcode 7的`svn`版本为`1.7.22`，Xcode 8的`svn`版本为`1.9.4`，新版svn会升级文件格式，故敬慎升级。  
