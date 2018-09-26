@@ -8,8 +8,8 @@ sitemap:
 
     <div class="row main-row">
         <div class="col-xs-12 col-sm-7">
-            <div clsss="row post-list">            
-        
+            <div clsss="row post-list">
+
                 {% for post in paginator.posts %}
                 <div class="post-item">
                     <a class="h1" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
@@ -24,25 +24,25 @@ sitemap:
             <div class="row paginator">
                 <div class="col-xs-6 col-sm-6 text-left">
                     {% if paginator.previous_page %}
-                
+
                         {% if paginator.previous_page == 1 %}
                         <a href="/" class="btn btn-primary btn-lg" role="button" ><span class="glyphicon glyphicon-arrow-left"> NEW <span class="glyphicon glyphicon-arrow-left"></a>
                         {% else %}
                         <a href="{{ paginator.previous_page_path }}" class="btn btn-primary btn-lg" role="button"><span class="glyphicon glyphicon-arrow-left"> NEW <span class="glyphicon glyphicon-arrow-left"></a>
                         {% endif %}
-                    
+
                     {% endif %}
                 </div>
-                
+
                 <div class="col-xs-6 col-sm-6 text-right">
                     {% if paginator.next_page %}
-                    
+
                     <a href="{{ paginator.next_page_path }}" class="btn btn-primary btn-lg" role="button"><span class="glyphicon glyphicon-arrow-right"></span> &nbsp;&nbsp;OLD &nbsp;&nbsp;<span class="glyphicon glyphicon-arrow-right"></span></a>
-                    
-                    
+
+
                     {% endif %}
                 </div>
-            
+
             </div>
         </div>
         <!-- <div class="col-xs-12 col-sm-1"></div> -->
@@ -50,7 +50,7 @@ sitemap:
         <div class="col-xs-12 col-sm-5 side-info">
             <div class="row">
                 <div class="col-xs-12">
-                    <img src="http://7xip1j.com1.z0.glb.clouddn.com/img/me.png" class="img-thumbnail photo" alt="ChrisCheng">
+                    <img src="https://dn-ztgame.qbox.me/img/me.png" class="img-thumbnail photo" alt="ChrisCheng">
                 </div>
             </div>
             <div class="row">
@@ -58,21 +58,21 @@ sitemap:
                     <h2>程澈</h2>
                     <h4>一个新鲜的游戏开发攻城狮</h4>
                     <h4>一个Web技术的爱好者</h4>
-                    <h4>最近被Ukulele吸引，准备进入混乱的艺术世界</h4>    
+                    <h4>最近被Ukulele吸引，准备进入混乱的艺术世界</h4>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-xs-12">
                     <div class="rotate_plane">
-                        <img src="{{ "/img/plane.svg" | prepend: site.baseurl }}" class="decorate-tex">    
+                        <img src="{{ "/img/plane.svg" | prepend: site.baseurl }}" class="decorate-tex">
                     </div>
                 </div>
             </div>
-            
+
         </div>
     </div>
-    
+
 </div>
 
 <script type="text/javascript">
