@@ -78,9 +78,13 @@ if(MSVC)
 elseif(ANDROID)
     # Android 动态链接库
     add_library(${PROJECT_NAME} SHARED ${SRC_LIST} ${INC_LIST})
-else()
+elseif(IOS)
     # iOS 静态库
     add_library(${PROJECT_NAME} STATIC ${SRC_LIST} ${INC_LIST})
+else()
+    # Mac 动态链接库
+    add_library(${PROJECT_NAME} MODULE ${SRC_LIST} ${INC_LIST})
+    set_target_properties(${PROJECT_NAME} PROPERTIES BUNDLE TRUE)
 endif()
 ```
 
@@ -91,6 +95,12 @@ endif()
 1.	在CMakeList.txt文件目录下，创建一个Build目录。
 2.	命令行进入Build目录，`cmake -G "Visual Studio 14 Win64" ..`，会生成一个VS工程。
 3.	VS打开生成的工程，编译生成的dll就可以供Unity项目使用了。
+
+### Mac
+
+1.  在CMakeList.txt文件目录下，创建一个Build目录。
+2.  命令行进入Build目录，`cmake -G "Xcode" ..`，会生成一个Xcode工程。
+3.  Xcode打开生成的工程，编译生成的.bundle就可以供Unity项目使用了。
 
 ### iOS
 
