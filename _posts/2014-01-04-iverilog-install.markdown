@@ -8,10 +8,10 @@ categories: Verilog
 
 开始学习Verilog HDL了，别人推荐了iverilog这个小型仿真工具。比起大型的IDE，个人感觉初期还是用这些简洁的工具要好一些。
 
-[iverilog](http://iverilog.icarus.com/)运行于终端模式下，安装完成之后通过iverilog执行编译，生成的文件通过vvp执行仿真。
+[iverilog](https://iverilog.icarus.com/)运行于终端模式下，安装完成之后通过iverilog执行编译，生成的文件通过vvp执行仿真。
 配合gtkwave可以实现图形化的波形显示。
 
-关于iverilog的安装，官网给出了教程[传送门](http://iverilog.wikia.com/wiki/Installation_Guide)
+关于iverilog的安装，官网给出了教程[传送门](https://iverilog.wikia.com/wiki/Installation_Guide)
 另外，网上的教程比较多。
 
 ## 三个平台

@@ -236,7 +236,7 @@ long ElapsedSecond = ticks / CLOCKS_PER_SEC;
 **Win32**
 
 ```
-// 包含 windows.h 
+// 包含 windows.h
 static LARGE_INTEGER m_StartTime;
 static LONGLONG m_LastTime;
 static DWORD m_StartTick;
@@ -271,7 +271,7 @@ unsigned long getMilliseconds()
 
 		Ticks = (unsigned long)(1000 * TimeOffset / frequency.QuadPart);
 	}
-	
+
 	m_LastTime = TimeOffset;
 
 	return Ticks;
@@ -393,7 +393,7 @@ GetClientRect(hwnd, &rect);
 ```
 
 **Linux**
-关于Linux上的窗口系统，可以参考《[关于X11](http://blog.icodeten.com/game/dev/2015/03/11/about-X11/ "about x11")》这篇文章。
+关于Linux上的窗口系统，可以参考《[关于X11](https://blog.icodeten.com/game/dev/2015/03/11/about-X11/ "about x11")》这篇文章。
 
 ## 设备IO
 对于大部分应用程序而言，其输出设备主要是显示器、音箱（或耳机），输入设备则种类较多：键盘、鼠标、游戏杆、游戏手柄、摄像头、麦克风等。一个典型的跨平台的人机接口函数库如OIS（Object Oriented Input System，面向对象输入系统）。

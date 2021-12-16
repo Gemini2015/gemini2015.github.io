@@ -2,7 +2,7 @@
 layout: post
 title: 关于X11
 date: 2015-03-11 22:43:00
-categories: game dev 
+categories: game dev
 description: 关于X11的一些笔记
 ---
 
@@ -73,7 +73,7 @@ Window window = XCreateWindow(display, parent, x, y, width, height, border_width
 对于一个窗口来说，经常会使用到的属性无外乎窗口标题、大小、位置、颜色深度、可见性等。
 
 -   窗口标题
-    
+
     ```
     Display *display;
     Window window;
@@ -91,7 +91,7 @@ Window window = XCreateWindow(display, parent, x, y, width, height, border_width
     也就是说，具体的行为是由窗口管理器(Window Manager)定义的。至少在我运行的平台上，该函数可以设置窗口标题。
 
 -   窗口位置
-    
+
     ```
     Display *display;
     Window window;
@@ -118,7 +118,7 @@ Window window = XCreateWindow(display, parent, x, y, width, height, border_width
     代码意思很清楚，获取窗口的属性，而且`attr`中也有`x,y`字段。但是实际上这样做是得不到结果的。得到的`x,y`一直都是`0,0`。目前还没弄明白`attr`里面的`x,y`字段到底有什么用。
 
 -   窗口大小
-    
+
     ```
     Display *display;
     Window window;
@@ -133,7 +133,7 @@ Window window = XCreateWindow(display, parent, x, y, width, height, border_width
 对于X Window来说，有两种方式可以关闭窗口。
 
 -   用户通过代码关闭窗口
-    
+
     ```
     Display *display;
     Window window;  // 待关闭的窗口
@@ -260,5 +260,5 @@ void EventProcess(XEvent& event)
 ## 杂项
 
 - [Linux上的OpenGL编程](https://www.opengl.org/wiki/OpenGL_in_Linux:_Programming "OpenGL in Linux: Programming")，简单介绍了X11与OpenGL的关联操作。
-- [Xlib Programming Manaul](http://www.sbin.org/doc/Xlib/ "Xlib Programming Manaul")，Xlib编程手册。
-- [Xlib Programming](http://tronche.com/gui/x/ "Xlib Programming")，这个网站也可以参考一下。
+- [Xlib Programming Manaul](https://www.sbin.org/doc/Xlib/ "Xlib Programming Manaul")，Xlib编程手册。
+- [Xlib Programming](https://tronche.com/gui/x/ "Xlib Programming")，这个网站也可以参考一下。

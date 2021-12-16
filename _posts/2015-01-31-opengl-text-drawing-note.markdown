@@ -2,7 +2,7 @@
 layout: post
 title: FreeType文字绘制笔记
 date: 2015-01-31 22:28:41
-categories: game dev 
+categories: game dev
 description: 记录利用FreeType进行文字绘制的过程
 ---
 
@@ -16,7 +16,7 @@ description: 记录利用FreeType进行文字绘制的过程
 
 
 ## FreeType相关术语
-对于相关术语，此处只列出条目，具体含义可以参考freetype官网上的[相关内容](http://www.freetype.org/freetype2/docs/glyphs/glyphs-1.html)。
+对于相关术语，此处只列出条目，具体含义可以参考freetype官网上的[相关内容](https://www.freetype.org/freetype2/docs/glyphs/glyphs-1.html)。
 
 - 字体(font)
 - 字体家族(font family)
@@ -242,7 +242,7 @@ GetCellSize(tempRangeList, &max_width, &max_height);
  	开始填充格子
 */
 // 先创建一个纹理ID，
-UINT nTexID = CreateTexture();	
+UINT nTexID = CreateTexture();
 // 创建一个内存纹理，等内存纹理填充完毕之后，再传输到硬件缓冲上。
 int width = 2048;	// 内存纹理宽度
 int height = 2048;	// 内存纹理高度
@@ -272,7 +272,7 @@ foreach range in tempRangeList
 
 			// 创建一个新的纹理ID
 			nTexID = CreateTexture();
-			
+
 			// 更新画笔位置
 			penx = peny = 0;
 		}
@@ -349,7 +349,7 @@ TexGlyph_Map m_texGlyphMap;
 	int x, y;		// pen pos
 	float swidth;		// canvas size
 	float sheight;
-	
+
 	float width = uv.right - uv.left;
 	float height = uv.bottom - uv.top;
 	float aspect = height / width;
@@ -394,7 +394,7 @@ TexGlyph_Map m_texGlyphMap;
 	if(width > height)
 	{
 		// ...
-		
+
 		*advance = size;
 	}
 	else

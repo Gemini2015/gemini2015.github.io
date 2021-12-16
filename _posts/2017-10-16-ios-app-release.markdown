@@ -220,9 +220,9 @@ Xcode设置好之后，可以使用下面的命令，生成商店ipa包。
 
 
 ## 提交ipa
-在**[iTunes Connect](https://itunesconnect.apple.com)**上完成基本设置。  
-在Mac机器上，通过Xcode->Open Developer Tool启动`Application Loader`，选择**交付您的应用**，选取对应的ipa包，然后一直点下一步就可以了。  
-上传完成之后，需要经过一段时间的处理，处理完成之后就可以选择该构建版本进行审核发布。  
+在**[iTunes Connect](https://itunesconnect.apple.com)**上完成基本设置。
+在Mac机器上，通过Xcode->Open Developer Tool启动`Application Loader`，选择**交付您的应用**，选取对应的ipa包，然后一直点下一步就可以了。
+上传完成之后，需要经过一段时间的处理，处理完成之后就可以选择该构建版本进行审核发布。
 关于iTunes Connect设置的具体细节，可以自行搜索。
 
 

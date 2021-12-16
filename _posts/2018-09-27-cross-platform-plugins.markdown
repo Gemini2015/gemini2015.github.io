@@ -7,7 +7,7 @@ codelang: shell
 ---
 
 ## 前言
-前一篇[文章](http://blog.icodeten.com/game/2016/07/20/unity-plugins/)介绍了如何使用Objective-C和Java开发iOS和Android平台的插件。使用OC和Java开发插件，主要目的是与系统API进行交互。这种方式基本上能满足大部分需求。
+前一篇[文章](https://blog.icodeten.com/game/2016/07/20/unity-plugins/)介绍了如何使用Objective-C和Java开发iOS和Android平台的插件。使用OC和Java开发插件，主要目的是与系统API进行交互。这种方式基本上能满足大部分需求。
 但是有些时候，需要使用一些C/C++开发的库，实现一些对性能要求很严格的代码，或是使用指针来操作数据的时候，就不得不使用C/C++来开发插件。本文主要介绍如何使用C/C++来编写跨平台代码，并使用CMake完成跨平台构建编译。
 
 ## 目标平台

@@ -282,4 +282,4 @@ endforeach()
 CMake只完成了从源文件到建立项目工程的过程，而真正编译，则还是要依赖于特定的编译工具，比如Visual Studio、gcc等。
 对于大型工程而言，工程的编译时间也是一件值得优化的事。目前，有一些工具可以加速基于CMake构建的工程的编译过程。
 
-*	[Electric Cloud Free CMake Accelerator](http://electric-cloud.com/plugins/build-automation/cmake-acceleration/)：似乎和 [Incredibuild](https://www.incredibuild.com/) 类似，利用本地集群分布式编译。
+*	[Electric Cloud Free CMake Accelerator](https://electric-cloud.com/plugins/build-automation/cmake-acceleration/)：似乎和 [Incredibuild](https://www.incredibuild.com/) 类似，利用本地集群分布式编译。
